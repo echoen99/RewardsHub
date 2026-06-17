@@ -105,7 +105,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onViewAl
           </div>
         </RewardsSection>
 
-        <DrawerFooterCta progress={data.progress} />
+        <DrawerFooterCta progress={data.progress} onViewHub={() => onViewAll('Rewards Hub')} />
       </div>
     </aside>
   );
