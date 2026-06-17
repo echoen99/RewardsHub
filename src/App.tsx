@@ -133,7 +133,6 @@ function App() {
             isLoading={isLoading}
             onClose={() => {
               setIsDrawerOpen(false);
-              setStatusMessage('Rewards Centre closed');
             }}
           />
         </div>
