@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 type RewardsSectionProps = {
   title: string;
@@ -11,6 +11,12 @@ type RewardsSectionProps = {
 
 export function RewardsSection({ title, count, subtitle, children, emptyMessage, onViewAll }: RewardsSectionProps) {
   const hasItems = count === undefined || count > 0;
+  const [hasClickedViewAll, setHasClickedViewAll] = useState(false);
+
+  function handleViewAllClick() {
+    setHasClickedViewAll(true);
+    onViewAll?.();
+  }
 
   return (
     <section className="rewards-section" aria-labelledby={`${title.toLowerCase().replaceAll(' ', '-')}-title`}>
@@ -22,9 +28,9 @@ export function RewardsSection({ title, count, subtitle, children, emptyMessage,
             className="text-action"
             title="View all is not yet implemented"
             aria-label={`View all ${title} is not yet implemented`}
-            onClick={onViewAll}
+            onClick={handleViewAllClick}
           >
-            View all ({count}) - not yet implemented
+            View all ({count}){hasClickedViewAll ? ' - not yet implemented' : ''}
           </button>
         ) : null}
       </div>
