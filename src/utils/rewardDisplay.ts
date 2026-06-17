@@ -46,10 +46,6 @@ export function getRewardActionIntent(reward: Reward) {
   return 'opens reward details';
 }
 
-export function getActionLabelWithIntent(label: string, reward: Reward) {
-  return `${label} - ${getRewardActionIntent(reward)}`;
-}
-
 export function getRewardDisplayValue(reward: Reward) {
   if (reward.rewardType === 'DepositOffer' && getRewardDisplayTitle(reward) === 'World Cup Welcome Offer') {
     return '100% up to €100 Bonus + €20 Free Bet';

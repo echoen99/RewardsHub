@@ -23,10 +23,10 @@ const depositAmounts = [30, 50, 100, 200, 500];
 const paymentMethods = ['Visa / MC', 'Skrill', 'LuxonPay', 'Neteller'];
 const cashierTabs = [
   { label: 'Deposit', intent: 'current deposit step', active: true },
-  { label: 'Withdrawal - would open withdrawals', intent: 'would open withdrawals', active: false },
-  { label: 'History - would open cashier history', intent: 'would open cashier history', active: false },
-  { label: 'Limits - would open deposit limits', intent: 'would open deposit limits', active: false },
-  { label: 'Responsible Gaming - would open safer gaming tools', intent: 'would open safer gaming tools', active: false }
+  { label: 'Withdrawal', intent: 'would open withdrawals', active: false },
+  { label: 'History', intent: 'would open cashier history', active: false },
+  { label: 'Limits', intent: 'would open deposit limits', active: false },
+  { label: 'Responsible Gaming', intent: 'would open safer gaming tools', active: false }
 ];
 
 export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: CashierDrawerProps) {
@@ -75,8 +75,13 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
           <h2 id="payment-method-title">Payment method</h2>
           <div className="payment-methods__list">
             {paymentMethods.map((method, index) => (
-              <button type="button" className={index === 0 ? 'payment-method payment-method--selected' : 'payment-method'} key={method}>
-                {index === 0 ? method : `${method} - would switch payment method`}
+              <button
+                type="button"
+                className={index === 0 ? 'payment-method payment-method--selected' : 'payment-method'}
+                title={index === 0 ? 'selected payment method' : 'would switch payment method'}
+                key={method}
+              >
+                {method}
               </button>
             ))}
           </div>
@@ -99,8 +104,8 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
                 {formatCurrencyAmount(amount)}
               </button>
             ))}
-            <button type="button" className="deposit-amount deposit-amount--muted">
-              Other - would enter custom amount
+            <button type="button" className="deposit-amount deposit-amount--muted" title="would enter custom amount">
+              Other
             </button>
           </div>
         </section>
@@ -133,8 +138,8 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
             </div>
             <p>Deposit €30 or more to qualify</p>
             <div className="applied-reward-card__actions">
-              <button type="button">View rules - would show offer rules</button>
-              <button type="button">Remove reward - would remove applied reward</button>
+              <button type="button" title="would show offer rules">View rules</button>
+              <button type="button" title="would remove applied reward">Remove reward</button>
             </div>
           </article>
         </section>

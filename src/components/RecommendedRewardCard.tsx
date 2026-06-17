@@ -1,5 +1,5 @@
 import type { Reward } from '../types/rewards';
-import { formatRecommendedExpiry, getActionLabelWithIntent, getRewardDisplayTitle } from '../utils/rewardDisplay';
+import { formatRecommendedExpiry, getRewardActionIntent, getRewardDisplayTitle } from '../utils/rewardDisplay';
 import { ProductBadge } from './ProductBadge';
 
 type RecommendedRewardCardProps = {
@@ -24,8 +24,14 @@ export function RecommendedRewardCard({ reward, onAction }: RecommendedRewardCar
         <span className="reward-meta">
           {formatRecommendedExpiry(reward.expiresInHours)}
         </span>
-        <button type="button" className="primary-action" disabled={!reward.action.enabled} onClick={() => onAction(reward)}>
-          {getActionLabelWithIntent('PLAY NOW', reward)}
+        <button
+          type="button"
+          className="primary-action"
+          title={getRewardActionIntent(reward)}
+          disabled={!reward.action.enabled}
+          onClick={() => onAction(reward)}
+        >
+          PLAY NOW
         </button>
       </div>
       <div className="carousel-dots" aria-hidden="true">
