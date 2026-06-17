@@ -81,8 +81,8 @@ function App() {
     setStatusMessage(reward.cashierAction.confirmationMessage ?? `${reward.title} applied.`);
   }
 
-  function handleViewAll(sectionTitle: string) {
-    setStatusMessage(`${sectionTitle}: View all is not yet implemented.`);
+  function handleViewAll() {
+    setStatusMessage('Not yet implemented.');
   }
 
   return (
