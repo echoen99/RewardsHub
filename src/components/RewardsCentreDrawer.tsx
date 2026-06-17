@@ -13,11 +13,12 @@ type RewardsCentreDrawerProps = {
   data: RewardsHubData;
   appliedRewardIds: string[];
   onAction: (reward: Reward) => void;
+  onViewAll: (sectionTitle: string) => void;
   onClose: () => void;
   isLoading?: boolean;
 };
 
-export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose, isLoading = false }: RewardsCentreDrawerProps) {
+export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onViewAll, onClose, isLoading = false }: RewardsCentreDrawerProps) {
   const recommendedRewards = getRecommendedRewards(data.rewards).slice(0, 1).map(toFigmaRecommendedReward);
   const recommendedRewardIds = new Set(recommendedRewards.map((reward) => reward.rewardId));
   const readyRewards = data.rewards.filter((reward) => reward.status === 'ReadyNow').slice(0, 2).map(toFigmaReadyReward);
@@ -58,6 +59,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           count={3}
           subtitle="Rewards picked based on what you like"
           emptyMessage="No recommendations yet."
+          onViewAll={() => onViewAll('Recommended for you')}
         >
           <div className="single-card-stack">
             {recommendedRewards.map((reward) => (
@@ -66,7 +68,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           </div>
         </RewardsSection>
 
-        <RewardsSection title="Available offers" count={3} emptyMessage="No available offers right now.">
+        <RewardsSection title="Available offers" count={3} emptyMessage="No available offers right now." onViewAll={() => onViewAll('Available offers')}>
           <div className="offer-stack">
             {availableOffers.map((reward) => (
               <AvailableOfferCard
@@ -79,7 +81,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           </div>
         </RewardsSection>
 
-        <RewardsSection title="Ready now" count={readyRewards.length} emptyMessage="No rewards are ready right now.">
+        <RewardsSection title="Ready now" count={readyRewards.length} emptyMessage="No rewards are ready right now." onViewAll={() => onViewAll('Ready now')}>
           <div className="ready-grid">
             {readyRewards.map((reward) => (
               <ReadyRewardCard reward={reward} onAction={onAction} key={reward.rewardId} />
@@ -87,7 +89,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           </div>
         </RewardsSection>
 
-        <RewardsSection title="In progress" count={inProgressRewards.length} emptyMessage="No active reward missions.">
+        <RewardsSection title="In progress" count={inProgressRewards.length} emptyMessage="No active reward missions." onViewAll={() => onViewAll('In progress')}>
           <div className="single-card-stack">
             {inProgressRewards.map((reward) => (
               <ProgressRewardCard reward={reward} onAction={onAction} key={reward.rewardId} />
@@ -95,7 +97,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           </div>
         </RewardsSection>
 
-        <RewardsSection title="Expiring soon" count={expiringRewards.length} emptyMessage="Nothing is expiring soon.">
+        <RewardsSection title="Expiring soon" count={expiringRewards.length} emptyMessage="Nothing is expiring soon." onViewAll={() => onViewAll('Expiring soon')}>
           <div className="row-stack">
             {expiringRewards.map((reward) => (
               <RewardRow reward={reward} variant="expiring" onAction={onAction} key={reward.rewardId} />

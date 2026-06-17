@@ -81,6 +81,10 @@ function App() {
     setStatusMessage(reward.cashierAction.confirmationMessage ?? `${reward.title} applied.`);
   }
 
+  function handleViewAll(sectionTitle: string) {
+    setStatusMessage(`${sectionTitle}: View all is not yet implemented.`);
+  }
+
   return (
     <main className="app-shell">
       <div className="host-page">
@@ -125,6 +129,7 @@ function App() {
             data={data}
             appliedRewardIds={appliedRewardIds}
             onAction={handleRewardAction}
+            onViewAll={handleViewAll}
             isLoading={isLoading}
             onClose={() => {
               setIsDrawerOpen(false);
