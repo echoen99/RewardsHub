@@ -21,6 +21,13 @@ type CashierDrawerProps = {
 
 const depositAmounts = [30, 50, 100, 200, 500];
 const paymentMethods = ['Visa / MC', 'Skrill', 'LuxonPay', 'Neteller'];
+const cashierTabs = [
+  { label: 'Deposit', intent: 'current deposit step', active: true },
+  { label: 'Withdrawal - would open withdrawals', intent: 'would open withdrawals', active: false },
+  { label: 'History - would open cashier history', intent: 'would open cashier history', active: false },
+  { label: 'Limits - would open deposit limits', intent: 'would open deposit limits', active: false },
+  { label: 'Responsible Gaming - would open safer gaming tools', intent: 'would open safer gaming tools', active: false }
+];
 
 export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: CashierDrawerProps) {
   const [selectedAmount, setSelectedAmount] = useState(30);
@@ -49,19 +56,18 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
       </header>
 
       <nav className="cashier-tabs" aria-label="Cashier sections">
-        <button type="button" className="cashier-tabs__tab cashier-tabs__tab--active">
-          Deposit
-        </button>
-        <button type="button" className="cashier-tabs__tab">Withdrawal</button>
-        <button type="button" className="cashier-tabs__tab">
-          <History size={14} />
-          History
-        </button>
-        <button type="button" className="cashier-tabs__tab">Limits</button>
-        <button type="button" className="cashier-tabs__tab">
-          <HeartHandshake size={14} />
-          Responsible Gaming
-        </button>
+        {cashierTabs.map((tab) => (
+          <button
+            type="button"
+            className={tab.active ? 'cashier-tabs__tab cashier-tabs__tab--active' : 'cashier-tabs__tab'}
+            title={tab.intent}
+            key={tab.label}
+          >
+            {tab.label.startsWith('History') ? <History size={14} /> : null}
+            {tab.label.startsWith('Responsible') ? <HeartHandshake size={14} /> : null}
+            {tab.label}
+          </button>
+        ))}
       </nav>
 
       <div className={`cashier-content ${isConfirmed ? 'cashier-content--dimmed' : ''}`}>
@@ -70,7 +76,7 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
           <div className="payment-methods__list">
             {paymentMethods.map((method, index) => (
               <button type="button" className={index === 0 ? 'payment-method payment-method--selected' : 'payment-method'} key={method}>
-                {method}
+                {index === 0 ? method : `${method} - would switch payment method`}
               </button>
             ))}
           </div>
@@ -94,7 +100,7 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
               </button>
             ))}
             <button type="button" className="deposit-amount deposit-amount--muted">
-              Other
+              Other - would enter custom amount
             </button>
           </div>
         </section>
@@ -127,8 +133,8 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
             </div>
             <p>Deposit €30 or more to qualify</p>
             <div className="applied-reward-card__actions">
-              <button type="button">View rules</button>
-              <button type="button">Remove reward</button>
+              <button type="button">View rules - would show offer rules</button>
+              <button type="button">Remove reward - would remove applied reward</button>
             </div>
           </article>
         </section>

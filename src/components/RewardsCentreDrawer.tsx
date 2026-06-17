@@ -134,9 +134,12 @@ function toFigmaRecommendedReward(reward: Reward): Reward {
     },
     expiresInHours: 72,
     recommendationReason: 'Based on your slot play',
+    isCashierEligible: false,
     action: {
       ...reward.action,
-      label: 'PLAY NOW'
+      label: 'PLAY NOW',
+      type: 'DeepLink',
+      url: '/casino/starburst'
     }
   };
 }
@@ -152,6 +155,7 @@ function toFigmaAvailableOffer(reward: Reward): Reward {
     description: '100% up to €100 Bonus + €20 Free Bet',
     products: ['CrossProduct'],
     rewardTypeDisplayName: '',
+    isCashierEligible: true,
     value: {
       ...reward.value,
       originalAmount: 120,
@@ -181,7 +185,9 @@ function toFigmaReadyReward(reward: Reward, index: number): Reward {
       expiresInHours: 10,
       action: {
         ...reward.action,
-        label: 'USE NOW'
+        label: 'USE NOW',
+        type: 'DeepLink',
+        url: '/sports'
       }
     };
   }
@@ -203,7 +209,9 @@ function toFigmaReadyReward(reward: Reward, index: number): Reward {
     expiresInHours: 48,
     action: {
       ...reward.action,
-      label: 'PLAY NOW'
+      label: 'PLAY NOW',
+      type: 'DeepLink',
+      url: '/casino'
     }
   };
 }
@@ -214,6 +222,12 @@ function toFigmaProgressReward(reward: Reward): Reward {
     title: 'Weekly Reward',
     description: 'Place 3 bets of €10+',
     rewardTypeDisplayName: 'Weekly reward',
+    action: {
+      ...reward.action,
+      label: 'Continue mission',
+      type: 'DeepLink',
+      url: '/sports/rewards'
+    },
     progress: {
       current: 2,
       target: 3,
@@ -239,6 +253,12 @@ function toFigmaExpiringReward(reward: Reward): Reward {
       displayText: '€3'
     },
     expiresAt: null,
-    expiresInHours: 3.666
+    expiresInHours: 3.666,
+    action: {
+      ...reward.action,
+      label: 'View ticket',
+      type: 'DeepLink',
+      url: '/poker/tournaments'
+    }
   };
 }

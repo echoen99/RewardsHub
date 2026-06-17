@@ -16,6 +16,40 @@ export function formatCurrencyCopy(value: string) {
   return value.replace(/\bEUR\s+(\d+(?:\.\d{2})?)/g, '€$1');
 }
 
+export function getRewardActionIntent(reward: Reward) {
+  const title = getRewardDisplayTitle(reward).toLowerCase();
+
+  if (reward.rewardType === 'DepositOffer') {
+    return 'opens cashier deposit flow';
+  }
+
+  if (title.includes('starburst')) {
+    return 'opens Starburst';
+  }
+
+  if (reward.rewardType === 'FreeBet' || reward.products.includes('Sports')) {
+    return 'opens Sportsbook';
+  }
+
+  if (reward.rewardType === 'FreeSpins' || reward.products.includes('Casino')) {
+    return 'opens casino games';
+  }
+
+  if (reward.rewardType === 'PokerTicket' || reward.products.includes('Poker')) {
+    return 'opens poker lobby';
+  }
+
+  if (reward.status === 'InProgress') {
+    return 'opens mission details';
+  }
+
+  return 'opens reward details';
+}
+
+export function getActionLabelWithIntent(label: string, reward: Reward) {
+  return `${label} - ${getRewardActionIntent(reward)}`;
+}
+
 export function getRewardDisplayValue(reward: Reward) {
   if (reward.rewardType === 'DepositOffer' && getRewardDisplayTitle(reward) === 'World Cup Welcome Offer') {
     return '100% up to €100 Bonus + €20 Free Bet';

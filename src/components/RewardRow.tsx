@@ -1,6 +1,6 @@
 import { ChevronRight, Star } from 'lucide-react';
 import type { Reward } from '../types/rewards';
-import { formatExpiringCountdown, getRewardDisplayDescription, getRewardDisplayTitle } from '../utils/rewardDisplay';
+import { formatExpiringCountdown, getActionLabelWithIntent, getRewardDisplayDescription, getRewardDisplayTitle } from '../utils/rewardDisplay';
 import { ProductBadge } from './ProductBadge';
 
 type RewardRowProps = {
@@ -24,7 +24,8 @@ export function RewardRow({ reward, variant, onAction }: RewardRowProps) {
         <p>{getRewardDisplayDescription(reward)}</p>
       </div>
       <button type="button" className="row-action" disabled={!reward.action.enabled} onClick={() => onAction(reward)}>
-        <ChevronRight size={17} aria-label={reward.action.label} />
+        <span>{getActionLabelWithIntent(reward.action.label, reward)}</span>
+        <ChevronRight size={17} aria-hidden="true" />
       </button>
     </article>
   );

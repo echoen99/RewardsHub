@@ -1,5 +1,5 @@
 import type { Reward } from '../types/rewards';
-import { formatReadyExpiry, getRewardDisplayValue } from '../utils/rewardDisplay';
+import { formatReadyExpiry, getActionLabelWithIntent, getRewardDisplayValue } from '../utils/rewardDisplay';
 import { ProductBadge } from './ProductBadge';
 
 type ReadyRewardCardProps = {
@@ -20,7 +20,7 @@ export function ReadyRewardCard({ reward, onAction }: ReadyRewardCardProps) {
       <span className="reward-description">{reward.description}</span>
       <span className="reward-meta reward-meta--expiry">{formatReadyExpiry(reward)}</span>
       <button type="button" className="secondary-action" disabled={!reward.action.enabled} onClick={() => onAction(reward)}>
-        {reward.action.label.toUpperCase()}
+        {getActionLabelWithIntent(reward.action.label.toUpperCase(), reward)}
       </button>
     </article>
   );

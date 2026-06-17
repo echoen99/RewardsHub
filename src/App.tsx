@@ -6,7 +6,7 @@ import { RewardsEntryWidget } from './components/RewardsEntryWidget';
 import { RewardsCentreDrawer } from './components/RewardsCentreDrawer';
 import { fallbackRewardsHubData } from './data/fallbackRewards';
 import type { CashierEligibleReward, Reward, RewardsHubData } from './types/rewards';
-import { getRewardDisplayTitle } from './utils/rewardDisplay';
+import { getRewardActionIntent, getRewardDisplayTitle } from './utils/rewardDisplay';
 
 function App() {
   const [data, setData] = useState<RewardsHubData>(fallbackRewardsHubData);
@@ -38,7 +38,7 @@ function App() {
       return;
     }
 
-    if (reward.status === 'AvailableOffer') {
+    if (reward.status === 'AvailableOffer' && reward.isCashierEligible) {
       setCashierOffer(reward);
       setIsDrawerOpen(false);
       setStatusMessage(null);
@@ -46,7 +46,7 @@ function App() {
     }
 
     if (reward.action.type === 'DeepLink' && reward.action.url) {
-      setStatusMessage(`Opening ${getRewardDisplayTitle(reward)}`);
+      setStatusMessage(`${getRewardDisplayTitle(reward)}: ${getRewardActionIntent(reward)}.`);
       return;
     }
 
@@ -58,7 +58,7 @@ function App() {
       return;
     }
 
-    setStatusMessage(`Viewing ${getRewardDisplayTitle(reward)}`);
+    setStatusMessage(`${getRewardDisplayTitle(reward)}: ${getRewardActionIntent(reward)}.`);
   }
 
   function handleDepositConfirmed(reward: Reward) {

@@ -15,7 +15,7 @@ export function DrawerFooterCta({ progress }: DrawerFooterCtaProps) {
       </div>
       <ProgressBar percentage={progress.progressPercentage} />
       <button type="button" className="footer-action">
-        VIEW ALL REWARDS HUB
+        VIEW ALL REWARDS HUB - would open full hub
         <ArrowRight size={15} />
       </button>
     </footer>
