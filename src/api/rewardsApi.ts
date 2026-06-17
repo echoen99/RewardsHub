@@ -8,7 +8,8 @@ import type {
   RewardProgressSummary,
   RewardsHubData,
   RewardsOverview,
-  RewardsUiState
+  RewardsUiState,
+  RewardsWidget
 } from '../types/rewards';
 
 const apiBaseUrl = import.meta.env.VITE_REWARDS_API_BASE_URL ?? 'http://localhost:5136';
@@ -26,17 +27,19 @@ async function getJson<T>(path: string): Promise<T> {
 
 export async function getRewardsHubData(): Promise<RewardsHubData> {
   try {
-    const [player, overview, rewards, history, progress, entryPoint, uiState] = await Promise.all([
+    const [player, overview, widget, rewards, cashierRewards, history, progress, entryPoint, uiState] = await Promise.all([
       getJson<Player>(`/api/v1/players/${encodeURIComponent(playerId)}`),
       getJson<RewardsOverview>('/api/v1/rewards-centre/overview'),
+      getJson<RewardsWidget>('/api/v1/rewards-centre/widget'),
       getJson<Reward[]>('/api/v1/rewards-centre/rewards'),
+      getJson<CashierEligibleReward[]>('/api/v1/cashier/rewards/eligible'),
       getJson<RewardHistoryItem[]>('/api/v1/rewards-centre/history'),
       getJson<RewardProgressSummary>('/api/v1/rewards-centre/progress'),
       getJson<EntryPoint>('/api/v1/rewards-centre/entry-point'),
       getJson<RewardsUiState>('/api/v1/rewards-centre/ui-state')
     ]);
 
-    return { player, overview, rewards, history, progress, entryPoint, uiState };
+    return { player, overview, widget, rewards, cashierRewards, history, progress, entryPoint, uiState };
   } catch (error) {
     console.warn('Rewards API unavailable, using RewardsHub development data.', error);
     return fallbackRewardsHubData;

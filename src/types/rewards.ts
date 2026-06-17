@@ -120,6 +120,34 @@ export type CashierEligibleReward = {
   cashierAction: RewardAction;
 };
 
+export type RewardsWidgetBadgeTone = 'Success' | 'Warning' | 'Neutral';
+
+export type RewardsWidget = {
+  title: string;
+  subtitle: string;
+  leadingIcon: string;
+  points: {
+    balance: number;
+    balanceDisplay: string;
+    label: string;
+    accentIcon: string;
+  };
+  badges: Array<{
+    key: string;
+    count: number;
+    label: string;
+    tone: RewardsWidgetBadgeTone;
+    icon: string;
+  }>;
+  progress: {
+    percentage: number;
+    label: string;
+    targetIcon: string;
+  };
+  primaryAction: RewardAction;
+  secondaryAction: RewardAction;
+};
+
 export type RewardProgressSummary = {
   pointsBalance: number;
   nextGiftTarget: number;
@@ -157,7 +185,9 @@ export type RewardsUiState = {
 export type RewardsHubData = {
   player: Player;
   overview: RewardsOverview;
+  widget: RewardsWidget;
   rewards: Reward[];
+  cashierRewards: CashierEligibleReward[];
   history: RewardHistoryItem[];
   progress: RewardProgressSummary;
   entryPoint: EntryPoint;

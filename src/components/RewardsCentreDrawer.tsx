@@ -13,9 +13,10 @@ type RewardsCentreDrawerProps = {
   appliedRewardIds: string[];
   onAction: (reward: Reward) => void;
   onClose: () => void;
+  isLoading?: boolean;
 };
 
-export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose }: RewardsCentreDrawerProps) {
+export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose, isLoading = false }: RewardsCentreDrawerProps) {
   const recommendedRewards = getRecommendedRewards(data.rewards);
   const readyRewards = data.rewards.filter((reward) => reward.status === 'ReadyNow');
   const inProgressRewards = data.rewards.filter((reward) => reward.status === 'InProgress');
@@ -23,6 +24,23 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose 
   const availableOffers = data.rewards.filter(
     (reward) => reward.status === 'AvailableOffer' && !appliedRewardIds.includes(reward.rewardId)
   );
+
+  if (isLoading) {
+    return (
+      <aside className="rewards-drawer rewards-drawer--loading" aria-label="Rewards Centre" aria-busy="true">
+        <div className="skeleton skeleton--header" />
+        <div className="skeleton-grid" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="skeleton skeleton--card" />
+        <div className="skeleton skeleton--row" />
+        <div className="skeleton skeleton--row" />
+      </aside>
+    );
+  }
 
   return (
     <aside className="rewards-drawer" aria-label="Rewards Centre">

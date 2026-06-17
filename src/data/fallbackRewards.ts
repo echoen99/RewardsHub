@@ -25,6 +25,52 @@ export const fallbackRewardsHubData: RewardsHubData = {
     badgeCount: 3,
     primaryMessage: '250 points to your next gift'
   },
+  widget: {
+    title: 'Rewards Centre',
+    subtitle: 'Your rewards, points and progress',
+    leadingIcon: 'Gift',
+    points: {
+      balance: 1250,
+      balanceDisplay: '1,250',
+      label: '888 Points',
+      accentIcon: 'Star'
+    },
+    badges: [
+      {
+        key: 'readyRewards',
+        count: 2,
+        label: '2 rewards ready',
+        tone: 'Success',
+        icon: 'CheckCircle'
+      },
+      {
+        key: 'expiringToday',
+        count: 1,
+        label: '1 expiring today',
+        tone: 'Warning',
+        icon: 'Clock'
+      }
+    ],
+    progress: {
+      percentage: 83,
+      label: '83% to your next free gift',
+      targetIcon: 'Gift'
+    },
+    primaryAction: {
+      label: 'Open Rewards Centre',
+      type: 'ViewDetails',
+      url: null,
+      enabled: true,
+      confirmationMessage: null
+    },
+    secondaryAction: {
+      label: 'View all rewards & history',
+      type: 'ViewDetails',
+      url: null,
+      enabled: true,
+      confirmationMessage: null
+    }
+  },
   progress: {
     pointsBalance: 1250,
     nextGiftTarget: 1500,
@@ -328,6 +374,34 @@ export const fallbackRewardsHubData: RewardsHubData = {
       },
       action: {
         label: 'Opt in',
+        type: 'MockApply',
+        url: null,
+        enabled: true,
+        confirmationMessage: 'Weekend Free Spins applied.'
+      }
+    }
+  ],
+  cashierRewards: [
+    {
+      rewardId: 'reward_010',
+      title: 'World Cup Welcome Offer',
+      status: 'AvailableOffer',
+      isCashierEligible: true,
+      cashierAction: {
+        label: 'Apply reward',
+        type: 'MockApply',
+        url: null,
+        enabled: true,
+        confirmationMessage: 'World Cup Reward applied: EUR 100 Casino Bonus + EUR 20 Free Bet.'
+      }
+    },
+    {
+      rewardId: 'reward_011',
+      title: 'Weekend Free Spins',
+      status: 'AvailableOffer',
+      isCashierEligible: true,
+      cashierAction: {
+        label: 'Apply reward',
         type: 'MockApply',
         url: null,
         enabled: true,
