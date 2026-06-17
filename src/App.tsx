@@ -35,6 +35,14 @@ function App() {
       return;
     }
 
+    if (reward.status === 'AvailableOffer') {
+      setAppliedRewardIds((currentIds) =>
+        currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
+      );
+      setStatusMessage(reward.action.confirmationMessage ?? `${reward.title} opted in.`);
+      return;
+    }
+
     if (reward.action.type === 'DeepLink' && reward.action.url) {
       setStatusMessage(`Opening ${reward.title}`);
       return;

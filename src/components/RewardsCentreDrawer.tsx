@@ -1,4 +1,5 @@
 import type { Reward, RewardsHubData } from '../types/rewards';
+import { AvailableOfferCard } from './AvailableOfferCard';
 import { DrawerFooterCta } from './DrawerFooterCta';
 import { ProgressRewardCard } from './ProgressRewardCard';
 import { ReadyRewardCard } from './ReadyRewardCard';
@@ -21,9 +22,7 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
   const readyRewards = data.rewards.filter((reward) => reward.status === 'ReadyNow');
   const inProgressRewards = data.rewards.filter((reward) => reward.status === 'InProgress');
   const expiringRewards = data.rewards.filter((reward) => reward.status === 'ExpiringSoon' || reward.isExpiringSoon);
-  const availableOffers = data.rewards.filter(
-    (reward) => reward.status === 'AvailableOffer' && !appliedRewardIds.includes(reward.rewardId)
-  );
+  const availableOffers = data.rewards.filter((reward) => reward.status === 'AvailableOffer');
 
   if (isLoading) {
     return (
@@ -81,9 +80,14 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
         </RewardsSection>
 
         <RewardsSection title="Available offers" count={availableOffers.length} emptyMessage="No available offers right now.">
-          <div className="row-stack">
+          <div className="offer-stack">
             {availableOffers.map((reward) => (
-              <RewardRow reward={reward} variant="offer" onAction={onAction} key={reward.rewardId} />
+              <AvailableOfferCard
+                reward={reward}
+                isApplied={appliedRewardIds.includes(reward.rewardId)}
+                onOptIn={onAction}
+                key={reward.rewardId}
+              />
             ))}
           </div>
         </RewardsSection>
