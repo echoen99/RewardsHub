@@ -1,4 +1,4 @@
-import { CheckCircle, ChevronDown, ChevronUp, Clock, Info } from 'lucide-react';
+import { CheckCircle, ChevronDown, ChevronUp, Info, Zap } from 'lucide-react';
 import { useState } from 'react';
 import type { Reward } from '../types/rewards';
 import { ProductBadge } from './ProductBadge';
@@ -10,16 +10,21 @@ type AvailableOfferCardProps = {
 };
 
 export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOfferCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showRules, setShowRules] = useState(false);
   const restrictions = reward.rules.restrictions.slice(0, 2);
-
-  function handleConfirm() {
-    onOptIn(reward);
-    setIsExpanded(false);
-  }
 
   return (
     <article className={`available-offer ${isApplied ? 'available-offer--applied' : ''}`}>
+      <div className="available-offer__flag">
+        <span>
+          <Zap size={12} />
+          Featured
+        </span>
+        <span className="available-offer__eligibility">
+          <CheckCircle size={12} />
+          {isApplied ? 'Applied' : 'Eligible'}
+        </span>
+      </div>
       <div className="available-offer__summary">
         <div className="available-offer__icon" aria-hidden="true">
           {isApplied ? <CheckCircle size={17} /> : <Info size={17} />}
@@ -38,19 +43,21 @@ export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOffe
           type="button"
           className={isApplied ? 'offer-applied-action' : 'offer-opt-in-action'}
           disabled={isApplied || !reward.action.enabled}
-          onClick={() => setIsExpanded(true)}
+          onClick={() => onOptIn(reward)}
         >
-          {isApplied ? 'Applied' : 'Opt in'}
+          {isApplied ? 'Applied' : 'OPT IN'}
         </button>
       </div>
 
-      {isExpanded && !isApplied ? (
+      <button type="button" className="available-offer__disclosure" onClick={() => setShowRules((current) => !current)}>
+        View rules
+        {showRules ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+      </button>
+
+      {showRules ? (
         <div className="available-offer__flow">
           <div className="available-offer__flow-header">
-            <strong>Opt in to this offer</strong>
-            <button type="button" className="text-icon-action" aria-label="Collapse opt in details" onClick={() => setIsExpanded(false)}>
-              <ChevronUp size={16} />
-            </button>
+            <strong>Offer rules</strong>
           </div>
 
           <dl className="available-offer__details">
@@ -83,23 +90,7 @@ export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOffe
               ))}
             </ul>
           ) : null}
-
-          <div className="available-offer__actions">
-            <button type="button" className="confirm-opt-in-action" onClick={handleConfirm}>
-              Confirm opt in
-            </button>
-            <button type="button" className="cancel-opt-in-action" onClick={() => setIsExpanded(false)}>
-              Cancel
-            </button>
-          </div>
         </div>
-      ) : null}
-
-      {!isExpanded && !isApplied ? (
-        <button type="button" className="available-offer__disclosure" onClick={() => setIsExpanded(true)}>
-          Offer details
-          <ChevronDown size={15} />
-        </button>
       ) : null}
 
       {isApplied ? (

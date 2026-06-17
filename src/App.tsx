@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getRewardsHubData } from './api/rewardsApi';
+import { CashierDrawer } from './components/CashierDrawer';
 import { CashierRewardsPanel } from './components/CashierRewardsPanel';
 import { RewardsEntryWidget } from './components/RewardsEntryWidget';
 import { RewardsCentreDrawer } from './components/RewardsCentreDrawer';
@@ -13,6 +14,7 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [cashierOffer, setCashierOffer] = useState<Reward | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,10 +38,9 @@ function App() {
     }
 
     if (reward.status === 'AvailableOffer') {
-      setAppliedRewardIds((currentIds) =>
-        currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
-      );
-      setStatusMessage(reward.action.confirmationMessage ?? `${reward.title} opted in.`);
+      setCashierOffer(reward);
+      setIsDrawerOpen(false);
+      setStatusMessage(null);
       return;
     }
 
@@ -57,6 +58,15 @@ function App() {
     }
 
     setStatusMessage(`Viewing ${reward.title}`);
+  }
+
+  function handleDepositConfirmed(reward: Reward) {
+    setAppliedRewardIds((currentIds) =>
+      currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
+    );
+    setCashierOffer(null);
+    setIsDrawerOpen(true);
+    setStatusMessage(`${reward.title} applied. Your rewards are waiting in Rewards Centre.`);
   }
 
   function handleCashierApply(reward: CashierEligibleReward) {
@@ -94,7 +104,21 @@ function App() {
         </div>
       </div>
 
-      {isDrawerOpen ? (
+      {cashierOffer ? (
+        <div className="drawer-overlay">
+          <CashierDrawer
+            offer={cashierOffer}
+            player={data.player}
+            onClose={() => {
+              setCashierOffer(null);
+              setIsDrawerOpen(true);
+            }}
+            onViewRewardsCentre={handleDepositConfirmed}
+          />
+        </div>
+      ) : null}
+
+      {isDrawerOpen && !cashierOffer ? (
         <div className="drawer-overlay">
           <RewardsCentreDrawer
             data={data}

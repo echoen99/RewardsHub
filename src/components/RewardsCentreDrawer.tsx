@@ -19,10 +19,13 @@ type RewardsCentreDrawerProps = {
 
 export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose, isLoading = false }: RewardsCentreDrawerProps) {
   const recommendedRewards = getRecommendedRewards(data.rewards);
+  const recommendedRewardIds = new Set(recommendedRewards.map((reward) => reward.rewardId));
   const readyRewards = data.rewards.filter((reward) => reward.status === 'ReadyNow');
   const inProgressRewards = data.rewards.filter((reward) => reward.status === 'InProgress');
   const expiringRewards = data.rewards.filter((reward) => reward.status === 'ExpiringSoon' || reward.isExpiringSoon);
-  const availableOffers = data.rewards.filter((reward) => reward.status === 'AvailableOffer');
+  const availableOffers = data.rewards.filter(
+    (reward) => reward.status === 'AvailableOffer' && !recommendedRewardIds.has(reward.rewardId)
+  );
 
   if (isLoading) {
     return (
@@ -55,6 +58,19 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           </div>
         </RewardsSection>
 
+        <RewardsSection title="Available offers" count={availableOffers.length} emptyMessage="No available offers right now.">
+          <div className="offer-stack">
+            {availableOffers.map((reward) => (
+              <AvailableOfferCard
+                reward={reward}
+                isApplied={appliedRewardIds.includes(reward.rewardId)}
+                onOptIn={onAction}
+                key={reward.rewardId}
+              />
+            ))}
+          </div>
+        </RewardsSection>
+
         <RewardsSection title="Ready now" count={readyRewards.length} emptyMessage="No rewards are ready right now.">
           <div className="ready-grid">
             {readyRewards.map((reward) => (
@@ -75,19 +91,6 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
           <div className="row-stack">
             {expiringRewards.map((reward) => (
               <RewardRow reward={reward} variant="expiring" onAction={onAction} key={reward.rewardId} />
-            ))}
-          </div>
-        </RewardsSection>
-
-        <RewardsSection title="Available offers" count={availableOffers.length} emptyMessage="No available offers right now.">
-          <div className="offer-stack">
-            {availableOffers.map((reward) => (
-              <AvailableOfferCard
-                reward={reward}
-                isApplied={appliedRewardIds.includes(reward.rewardId)}
-                onOptIn={onAction}
-                key={reward.rewardId}
-              />
             ))}
           </div>
         </RewardsSection>
