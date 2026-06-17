@@ -133,6 +133,7 @@ function App() {
             isLoading={isLoading}
             onClose={() => {
               setIsDrawerOpen(false);
+              setStatusMessage(null);
             }}
           />
         </div>
