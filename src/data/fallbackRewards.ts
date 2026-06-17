@@ -148,7 +148,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
         originalAmount: 5,
         remainingAmount: 5,
         currency: 'EUR',
-        displayText: 'EUR 5'
+        displayText: '€5'
       },
       expiresAt: inHours(10),
       isExpiringSoon: true,
@@ -218,7 +218,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
     {
       rewardId: 'reward_003',
       title: 'Weekly Reward',
-      description: 'Place 3 bets of EUR 10+',
+      description: 'Place 3 bets of €10+',
       rewardType: 'Gift',
       sourceRewardTypeId: null,
       rewardTypeDisplayName: 'Weekly reward',
@@ -250,7 +250,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
         eligibleProducts: ['Sports'],
         eligibleGames: null,
         eligibleMarkets: ['EU'],
-        restrictions: ['Qualifying bets must be EUR 10+']
+        restrictions: ['Qualifying bets must be €10+']
       },
       action: {
         label: 'Continue',
@@ -263,7 +263,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
     {
       rewardId: 'reward_004',
       title: 'Poker Ticket',
-      description: 'EUR 3 Tournament Ticket',
+      description: '€3 Tournament Ticket',
       rewardType: 'PokerTicket',
       sourceRewardTypeId: 7,
       rewardTypeDisplayName: 'Tournament ticket',
@@ -273,7 +273,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
         originalAmount: 3,
         remainingAmount: 3,
         currency: 'EUR',
-        displayText: 'EUR 3'
+        displayText: '€3'
       },
       expiresAt: inHours(3.75),
       isExpiringSoon: true,
@@ -303,7 +303,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
     {
       rewardId: 'reward_010',
       title: 'World Cup Welcome Offer',
-      description: '100% up to EUR 100 Bonus + EUR 20 Free Bet',
+      description: '100% up to €100 Bonus + €20 Free Bet',
       rewardType: 'DepositOffer',
       sourceRewardTypeId: null,
       rewardTypeDisplayName: 'Deposit offer',
@@ -313,7 +313,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
         originalAmount: 120,
         remainingAmount: 120,
         currency: 'EUR',
-        displayText: '100% up to EUR 100 + EUR 20'
+        displayText: '100% up to €100 Bonus + €20 Free Bet'
       },
       expiresAt: inHours(336),
       isExpiringSoon: false,
@@ -337,7 +337,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
         type: 'MockApply',
         url: null,
         enabled: true,
-        confirmationMessage: 'World Cup Reward applied: EUR 100 Casino Bonus + EUR 20 Free Bet.'
+        confirmationMessage: 'World Cup Welcome Offer applied: €100 Casino Bonus + €20 Free Bet.'
       }
     },
     {
@@ -392,7 +392,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
         type: 'MockApply',
         url: null,
         enabled: true,
-        confirmationMessage: 'World Cup Reward applied: EUR 100 Casino Bonus + EUR 20 Free Bet.'
+        confirmationMessage: 'World Cup Welcome Offer applied: €100 Casino Bonus + €20 Free Bet.'
       }
     },
     {
@@ -413,7 +413,7 @@ export const fallbackRewardsHubData: RewardsHubData = {
     {
       historyId: 'history_001',
       rewardId: 'reward_020',
-      title: 'EUR 5 Casino Bonus',
+      title: '€5 Casino Bonus',
       status: 'Used',
       eventType: 'Used',
       eventDate: inHours(-48),

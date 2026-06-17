@@ -3,12 +3,13 @@ import type { ReactNode } from 'react';
 type RewardsSectionProps = {
   title: string;
   count?: number;
+  subtitle?: string;
   children: ReactNode;
   emptyMessage?: string;
   onViewAll?: () => void;
 };
 
-export function RewardsSection({ title, count, children, emptyMessage, onViewAll }: RewardsSectionProps) {
+export function RewardsSection({ title, count, subtitle, children, emptyMessage, onViewAll }: RewardsSectionProps) {
   const hasItems = count === undefined || count > 0;
 
   return (
@@ -21,6 +22,7 @@ export function RewardsSection({ title, count, children, emptyMessage, onViewAll
           </button>
         ) : null}
       </div>
+      {subtitle ? <p className="rewards-section__subtitle">{subtitle}</p> : null}
       {hasItems ? children : <p className="empty-state">{emptyMessage ?? 'Nothing here right now.'}</p>}
     </section>
   );

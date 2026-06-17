@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import type { Player, Reward } from '../types/rewards';
+import { formatCurrencyAmount, getRewardDisplayTitle } from '../utils/rewardDisplay';
 
 type CashierDrawerProps = {
   offer: Reward;
@@ -34,8 +35,8 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
         <div className="cashier-header__copy">
           <h1>Cashier</h1>
           <p>
-            Cash <strong>EUR 0.00</strong>
-            <span>Bonus EUR 5.00</span>
+            Cash <strong>€0.00</strong>
+            <span>Bonus €5.00</span>
           </p>
         </div>
         <span className="cashier-promo">
@@ -89,7 +90,7 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
                 key={amount}
               >
                 {amount === 30 ? <span>Qualifies</span> : null}
-                EUR {amount}
+                {formatCurrencyAmount(amount)}
               </button>
             ))}
             <button type="button" className="deposit-amount deposit-amount--muted">
@@ -114,17 +115,17 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
                 Applied
               </strong>
             </div>
-            <h3>{offer.title}</h3>
+            <h3>{getRewardDisplayTitle(offer)}</h3>
             <div className="promo-code-row">
               <span>Promo code</span>
               <strong>KICKOFF</strong>
               <em>added automatically</em>
             </div>
             <div className="benefit-grid">
-              <span>Up to EUR 75 Casino Bonus</span>
-              <span>EUR 30 Sports Free Bets</span>
+              <span>Up to €75 Casino Bonus</span>
+              <span>€30 Sports Free Bets</span>
             </div>
-            <p>Deposit EUR 30 or more to qualify</p>
+            <p>Deposit €30 or more to qualify</p>
             <div className="applied-reward-card__actions">
               <button type="button">View rules</button>
               <button type="button">Remove reward</button>
@@ -160,12 +161,12 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
       <footer className="cashier-footer">
         <div>
           <span>Deposit</span>
-          <strong>EUR {selectedAmount}</strong>
+          <strong>{formatCurrencyAmount(selectedAmount)}</strong>
         </div>
         <div>
           <span>Promo</span>
           <strong>KICKOFF</strong>
-          <small>You get EUR 75 Bonus + EUR 30 Free Bets</small>
+          <small>You get €75 Bonus + €30 Free Bets</small>
         </div>
         <div className="cashier-footer__trust">
           <span>
@@ -178,7 +179,7 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
           </span>
         </div>
         <button type="button" className="deposit-confirm-action" onClick={() => setIsConfirmed(true)}>
-          Deposit EUR {selectedAmount}
+          Deposit {formatCurrencyAmount(selectedAmount)}
         </button>
       </footer>
 
@@ -189,8 +190,8 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
               <CheckCircle size={30} />
             </div>
             <h2 id="deposit-confirmed-title">Deposit Confirmed</h2>
-            <strong>EUR {selectedAmount}</strong>
-            <p>Your World Cup Welcome Offer has been applied. Your rewards are waiting in Rewards Centre.</p>
+            <strong>{formatCurrencyAmount(selectedAmount)}</strong>
+            <p>Your {getRewardDisplayTitle(offer)} has been applied. Your rewards are waiting in Rewards Centre.</p>
             <button type="button" className="view-rewards-action" onClick={() => onViewRewardsCentre(offer)}>
               <Gift size={15} />
               View in Rewards Centre

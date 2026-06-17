@@ -14,7 +14,7 @@ export function RewardsCentreHeader({ player, onClose }: RewardsCentreHeaderProp
       </div>
       <div className="rewards-header__copy">
         <p>Rewards Centre</p>
-        <h1>{`Hi ${player.displayName}, here are your rewards`}</h1>
+        <h1>{`Hi ${player.displayName}! Here are your rewards`}</h1>
       </div>
       <button type="button" className="icon-button" aria-label="Close rewards centre" onClick={onClose}>
         <X size={18} />

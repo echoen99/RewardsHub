@@ -1,4 +1,4 @@
-import { Flame, Gift, Sparkles, Trophy } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock3, Star } from 'lucide-react';
 import type { RewardsOverview } from '../types/rewards';
 
 type RewardsSummaryStatsProps = {
@@ -7,10 +7,10 @@ type RewardsSummaryStatsProps = {
 
 export function RewardsSummaryStats({ overview }: RewardsSummaryStatsProps) {
   const stats = [
-    { label: 'Ready', value: overview.readyRewardsCount, icon: Gift },
-    { label: 'Progress', value: overview.inProgressRewardsCount, icon: Trophy },
-    { label: 'Expiring', value: overview.expiringSoonCount, icon: Flame },
-    { label: overview.pointsName, value: overview.pointsBalance.toLocaleString(), icon: Sparkles }
+    { label: 'Ready now', value: overview.readyRewardsCount, icon: CheckCircle, tone: 'success' },
+    { label: 'In progress', value: overview.inProgressRewardsCount, icon: Clock3, tone: 'info' },
+    { label: 'Expiring soon', value: overview.expiringSoonCount, icon: AlertTriangle, tone: 'warning' },
+    { label: overview.pointsName, value: overview.pointsBalance.toLocaleString(), icon: Star, tone: 'points' }
   ];
 
   return (
@@ -19,7 +19,7 @@ export function RewardsSummaryStats({ overview }: RewardsSummaryStatsProps) {
         const Icon = stat.icon;
 
         return (
-          <div className="summary-tile" key={stat.label}>
+          <div className={`summary-tile summary-tile--${stat.tone}`} key={stat.label}>
             <Icon size={16} aria-hidden="true" />
             <strong>{stat.value}</strong>
             <span>{stat.label}</span>

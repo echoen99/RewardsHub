@@ -1,6 +1,7 @@
 import { CheckCircle, ChevronDown, ChevronUp, Info, Zap } from 'lucide-react';
 import { useState } from 'react';
 import type { Reward } from '../types/rewards';
+import { formatCurrencyAmount, formatExpiringCountdown, getRewardDisplayDescription, getRewardDisplayTitle, getRewardDisplayValue } from '../utils/rewardDisplay';
 import { ProductBadge } from './ProductBadge';
 
 type AvailableOfferCardProps = {
@@ -12,6 +13,7 @@ type AvailableOfferCardProps = {
 export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOfferCardProps) {
   const [showRules, setShowRules] = useState(false);
   const restrictions = reward.rules.restrictions.slice(0, 2);
+  const showProductBadge = !reward.products.includes('CrossProduct');
 
   return (
     <article className={`available-offer ${isApplied ? 'available-offer--applied' : ''}`}>
@@ -32,11 +34,11 @@ export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOffe
 
         <div className="available-offer__copy">
           <div className="available-offer__meta">
-            <ProductBadge products={reward.products} />
-            <span>{reward.rewardTypeDisplayName}</span>
+            {showProductBadge ? <ProductBadge products={reward.products} /> : null}
+            {reward.rewardTypeDisplayName ? <span>{reward.rewardTypeDisplayName}</span> : null}
           </div>
-          <h3>{reward.title}</h3>
-          <p>{reward.description}</p>
+          <h3>{getRewardDisplayTitle(reward)}</h3>
+          <p>{getRewardDisplayDescription(reward)}</p>
         </div>
 
         <button
@@ -61,14 +63,14 @@ export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOffe
           </div>
 
           <dl className="available-offer__details">
-            <div>
-              <dt>Reward</dt>
-              <dd>{reward.value.displayText}</dd>
-            </div>
+              <div>
+                <dt>Reward</dt>
+                <dd>{getRewardDisplayValue(reward)}</dd>
+              </div>
             {reward.rules.minimumDeposit !== null ? (
               <div>
                 <dt>Min deposit</dt>
-                <dd>{formatCurrency(reward.rules.minimumDeposit, reward.value.currency)}</dd>
+                <dd>{formatCurrencyAmount(reward.rules.minimumDeposit)}</dd>
               </div>
             ) : null}
             {reward.rules.wageringRequirement ? (
@@ -79,7 +81,7 @@ export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOffe
             ) : null}
             <div>
               <dt>Expiry</dt>
-              <dd>{formatExpiry(reward.expiresInHours)}</dd>
+              <dd>{formatExpiringCountdown(reward)}</dd>
             </div>
           </dl>
 
@@ -101,24 +103,4 @@ export function AvailableOfferCard({ reward, isApplied, onOptIn }: AvailableOffe
       ) : null}
     </article>
   );
-}
-
-function formatCurrency(amount: number, currency: string) {
-  if (currency === 'Spins') {
-    return `${amount} spins`;
-  }
-
-  return `${currency} ${amount}`;
-}
-
-function formatExpiry(hours: number | null) {
-  if (hours === null) {
-    return 'No expiry';
-  }
-
-  if (hours < 24) {
-    return `${Math.max(1, Math.round(hours))}h left`;
-  }
-
-  return `${Math.round(hours / 24)}d left`;
 }

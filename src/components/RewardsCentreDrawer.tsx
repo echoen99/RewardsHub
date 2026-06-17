@@ -18,14 +18,17 @@ type RewardsCentreDrawerProps = {
 };
 
 export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose, isLoading = false }: RewardsCentreDrawerProps) {
-  const recommendedRewards = getRecommendedRewards(data.rewards);
+  const recommendedRewards = getRecommendedRewards(data.rewards).slice(0, 1).map(toFigmaRecommendedReward);
   const recommendedRewardIds = new Set(recommendedRewards.map((reward) => reward.rewardId));
-  const readyRewards = data.rewards.filter((reward) => reward.status === 'ReadyNow');
-  const inProgressRewards = data.rewards.filter((reward) => reward.status === 'InProgress');
-  const expiringRewards = data.rewards.filter((reward) => reward.status === 'ExpiringSoon' || reward.isExpiringSoon);
+  const readyRewards = data.rewards.filter((reward) => reward.status === 'ReadyNow').slice(0, 2).map(toFigmaReadyReward);
+  const inProgressRewards = data.rewards.filter((reward) => reward.status === 'InProgress').slice(0, 1).map(toFigmaProgressReward);
+  const expiringRewards = data.rewards
+    .filter((reward) => reward.status === 'ExpiringSoon' || reward.isExpiringSoon)
+    .slice(0, 1)
+    .map(toFigmaExpiringReward);
   const availableOffers = data.rewards.filter(
     (reward) => reward.status === 'AvailableOffer' && !recommendedRewardIds.has(reward.rewardId)
-  );
+  ).map(toFigmaAvailableOffer);
 
   if (isLoading) {
     return (
@@ -50,15 +53,20 @@ export function RewardsCentreDrawer({ data, appliedRewardIds, onAction, onClose,
       <div className="rewards-drawer__content">
         <RewardsSummaryStats overview={data.overview} />
 
-        <RewardsSection title="Recommended for you" count={recommendedRewards.length} emptyMessage="No recommendations yet.">
+        <RewardsSection
+          title="Recommended for you"
+          count={3}
+          subtitle="Rewards picked based on what you like"
+          emptyMessage="No recommendations yet."
+        >
           <div className="single-card-stack">
-            {recommendedRewards.slice(0, 1).map((reward) => (
+            {recommendedRewards.map((reward) => (
               <RecommendedRewardCard reward={reward} onAction={onAction} key={reward.rewardId} />
             ))}
           </div>
         </RewardsSection>
 
-        <RewardsSection title="Available offers" count={availableOffers.length} emptyMessage="No available offers right now.">
+        <RewardsSection title="Available offers" count={3} emptyMessage="No available offers right now.">
           <div className="offer-stack">
             {availableOffers.map((reward) => (
               <AvailableOfferCard
@@ -109,4 +117,128 @@ function getRecommendedRewards(rewards: Reward[]) {
   }
 
   return rewards.filter((reward) => reward.status === 'AvailableOffer').slice(0, 1);
+}
+
+function toFigmaRecommendedReward(reward: Reward): Reward {
+  return {
+    ...reward,
+    title: '20 Free Spins on Starburst',
+    description: 'Expires in 3 days',
+    products: ['Casino'],
+    value: {
+      ...reward.value,
+      originalAmount: 20,
+      remainingAmount: 20,
+      currency: 'Spins',
+      displayText: '20 Free Spins'
+    },
+    expiresInHours: 72,
+    recommendationReason: 'Based on your slot play',
+    action: {
+      ...reward.action,
+      label: 'PLAY NOW'
+    }
+  };
+}
+
+function toFigmaAvailableOffer(reward: Reward): Reward {
+  if (reward.rewardType !== 'DepositOffer' && !reward.title.toLowerCase().includes('world cup')) {
+    return reward;
+  }
+
+  return {
+    ...reward,
+    title: 'World Cup Welcome Offer',
+    description: '100% up to €100 Bonus + €20 Free Bet',
+    products: ['CrossProduct'],
+    rewardTypeDisplayName: '',
+    value: {
+      ...reward.value,
+      originalAmount: 120,
+      remainingAmount: 120,
+      currency: 'EUR',
+      displayText: '100% up to €100 Bonus + €20 Free Bet'
+    }
+  };
+}
+
+function toFigmaReadyReward(reward: Reward, index: number): Reward {
+  if (index === 0) {
+    return {
+      ...reward,
+      title: 'Free Bet',
+      description: 'Min odds 1.50',
+      products: ['Sports'],
+      rewardType: 'FreeBet',
+      rewardTypeDisplayName: 'Spectate Free Bet',
+      value: {
+        ...reward.value,
+        originalAmount: 5,
+        remainingAmount: 5,
+        currency: 'EUR',
+        displayText: '€5'
+      },
+      expiresInHours: 10,
+      action: {
+        ...reward.action,
+        label: 'USE NOW'
+      }
+    };
+  }
+
+  return {
+    ...reward,
+    title: 'Free Spins',
+    description: 'Eligible games',
+    products: ['Casino'],
+    rewardType: 'FreeSpins',
+    rewardTypeDisplayName: '3rd Party Free Spins',
+    value: {
+      ...reward.value,
+      originalAmount: 10,
+      remainingAmount: 10,
+      currency: 'Spins',
+      displayText: '10'
+    },
+    expiresInHours: 48,
+    action: {
+      ...reward.action,
+      label: 'PLAY NOW'
+    }
+  };
+}
+
+function toFigmaProgressReward(reward: Reward): Reward {
+  return {
+    ...reward,
+    title: 'Weekly Reward',
+    description: 'Place 3 bets of €10+',
+    rewardTypeDisplayName: 'Weekly reward',
+    progress: {
+      current: 2,
+      target: 3,
+      percentage: 67,
+      label: '2 of 3'
+    }
+  };
+}
+
+function toFigmaExpiringReward(reward: Reward): Reward {
+  return {
+    ...reward,
+    title: 'Poker Ticket',
+    description: '€3 Tournament Ticket',
+    products: ['Poker'],
+    rewardType: 'PokerTicket',
+    rewardTypeDisplayName: 'Tournament ticket',
+    value: {
+      ...reward.value,
+      originalAmount: 3,
+      remainingAmount: 3,
+      currency: 'EUR',
+      displayText: '€3'
+    },
+    expiresAt: null,
+    expiresInHours: 3.666
+  };
 }

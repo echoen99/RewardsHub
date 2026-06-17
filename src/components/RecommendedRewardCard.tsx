@@ -1,5 +1,5 @@
-import { ArrowRight, Clock } from 'lucide-react';
 import type { Reward } from '../types/rewards';
+import { formatRecommendedExpiry, getRewardDisplayTitle } from '../utils/rewardDisplay';
 import { ProductBadge } from './ProductBadge';
 
 type RecommendedRewardCardProps = {
@@ -8,25 +8,24 @@ type RecommendedRewardCardProps = {
 };
 
 export function RecommendedRewardCard({ reward, onAction }: RecommendedRewardCardProps) {
+  const showBodyDescription = !reward.description.toLowerCase().startsWith('expires');
+
   return (
     <article className="recommended-card">
       <div className="recommended-card__topline">
         <ProductBadge products={reward.products} />
-        <span className="recommendation-chip">{reward.recommendationReason ?? 'Recommended'}</span>
       </div>
       <div className="recommended-card__body">
-        <p>{reward.value.displayText}</p>
-        <h3>{reward.title}</h3>
-        <span>{reward.description}</span>
+        <h3>{getRewardDisplayTitle(reward)}</h3>
+        <p>{reward.recommendationReason ?? 'Based on your slot play'}</p>
+        {showBodyDescription ? <span>{reward.description}</span> : null}
       </div>
       <div className="reward-card__footer">
         <span className="reward-meta">
-          <Clock size={14} />
-          {formatExpiry(reward.expiresInHours)}
+          {formatRecommendedExpiry(reward.expiresInHours)}
         </span>
         <button type="button" className="primary-action" disabled={!reward.action.enabled} onClick={() => onAction(reward)}>
-          {reward.action.label}
-          <ArrowRight size={15} />
+          PLAY NOW
         </button>
       </div>
       <div className="carousel-dots" aria-hidden="true">
@@ -36,16 +35,4 @@ export function RecommendedRewardCard({ reward, onAction }: RecommendedRewardCar
       </div>
     </article>
   );
-}
-
-function formatExpiry(hours: number | null) {
-  if (hours === null) {
-    return 'No expiry';
-  }
-
-  if (hours < 24) {
-    return `Expires in ${Math.max(1, Math.round(hours))}h`;
-  }
-
-  return `Expires in ${Math.round(hours / 24)}d`;
 }

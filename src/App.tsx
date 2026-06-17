@@ -6,6 +6,7 @@ import { RewardsEntryWidget } from './components/RewardsEntryWidget';
 import { RewardsCentreDrawer } from './components/RewardsCentreDrawer';
 import { fallbackRewardsHubData } from './data/fallbackRewards';
 import type { CashierEligibleReward, Reward, RewardsHubData } from './types/rewards';
+import { getRewardDisplayTitle } from './utils/rewardDisplay';
 
 function App() {
   const [data, setData] = useState<RewardsHubData>(fallbackRewardsHubData);
@@ -45,7 +46,7 @@ function App() {
     }
 
     if (reward.action.type === 'DeepLink' && reward.action.url) {
-      setStatusMessage(`Opening ${reward.title}`);
+      setStatusMessage(`Opening ${getRewardDisplayTitle(reward)}`);
       return;
     }
 
@@ -53,11 +54,11 @@ function App() {
       setAppliedRewardIds((currentIds) =>
         currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
       );
-      setStatusMessage(reward.action.confirmationMessage ?? `${reward.title} applied.`);
+      setStatusMessage(reward.action.confirmationMessage ?? `${getRewardDisplayTitle(reward)} applied.`);
       return;
     }
 
-    setStatusMessage(`Viewing ${reward.title}`);
+    setStatusMessage(`Viewing ${getRewardDisplayTitle(reward)}`);
   }
 
   function handleDepositConfirmed(reward: Reward) {
@@ -66,7 +67,7 @@ function App() {
     );
     setCashierOffer(null);
     setIsDrawerOpen(true);
-    setStatusMessage(`${reward.title} applied. Your rewards are waiting in Rewards Centre.`);
+    setStatusMessage(`${getRewardDisplayTitle(reward)} applied. Your rewards are waiting in Rewards Centre.`);
   }
 
   function handleCashierApply(reward: CashierEligibleReward) {

@@ -1,5 +1,6 @@
-import { ChevronRight, Clock } from 'lucide-react';
+import { ChevronRight, Star } from 'lucide-react';
 import type { Reward } from '../types/rewards';
+import { formatExpiringCountdown, getRewardDisplayDescription, getRewardDisplayTitle } from '../utils/rewardDisplay';
 import { ProductBadge } from './ProductBadge';
 
 type RewardRowProps = {
@@ -12,31 +13,19 @@ export function RewardRow({ reward, variant, onAction }: RewardRowProps) {
   return (
     <article className={`reward-row reward-row--${variant}`}>
       <div className="reward-row__icon" aria-hidden="true">
-        {variant === 'expiring' ? <Clock size={17} /> : <ChevronRight size={17} />}
+        {variant === 'expiring' ? <Star size={17} /> : <ChevronRight size={17} />}
       </div>
       <div className="reward-row__copy">
         <div>
           <ProductBadge products={reward.products} />
-          <span>{variant === 'expiring' ? formatExpiry(reward.expiresInHours) : reward.rewardTypeDisplayName}</span>
+          <span>{variant === 'expiring' ? formatExpiringCountdown(reward) : reward.rewardTypeDisplayName}</span>
         </div>
-        <h3>{reward.title}</h3>
-        <p>{reward.description}</p>
+        <h3>{getRewardDisplayTitle(reward)}</h3>
+        <p>{getRewardDisplayDescription(reward)}</p>
       </div>
       <button type="button" className="row-action" disabled={!reward.action.enabled} onClick={() => onAction(reward)}>
-        {reward.action.label}
+        <ChevronRight size={17} aria-label={reward.action.label} />
       </button>
     </article>
   );
-}
-
-function formatExpiry(hours: number | null) {
-  if (hours === null) {
-    return 'No expiry';
-  }
-
-  if (hours < 24) {
-    return `${Math.max(1, Math.round(hours))}h left`;
-  }
-
-  return `${Math.round(hours / 24)}d left`;
 }
