@@ -61,6 +61,107 @@ The drawer should show:
 
 Available offers must include the Figma opt-in flow, not only a generic row action. Each available offer should expose an `Opt in` button, expand into an inline confirmation/details area under the offer, and then remain visible in an applied/success state after confirmation.
 
+## Figma Screenshot Flow Requirements
+
+The implementation should match the three primary Figma screenshots provided by the product/design reference. These screenshots supersede earlier generic drawer assumptions where they conflict.
+
+### Screen 1: Rewards Centre
+
+The Rewards Centre is a dark right-side slide-out panel with dense reward sections.
+
+- Header:
+  - Green gift icon in a square/circle mark.
+  - Title `Rewards Centre`.
+  - Greeting line similar to `Hi Adrian! Here are your rewards`.
+  - Close button on the right.
+- Summary stat tiles:
+  - Four horizontal tiles: `Ready now`, `In progress`, `Expiring soon`, and points.
+  - Tiles use distinct icon/accent colors: green ready, blue progress, amber warning, yellow/star points.
+  - Counts are large and centered; labels remain compact.
+- Recommended section:
+  - Section title `Recommended for you`.
+  - Helper copy similar to `Rewards picked based on what you like`.
+  - Right-aligned `View all (3)`.
+  - Featured carousel-style card for `20 Free Spins on Starburst`.
+  - Casino badge, recommendation chip such as `Based on your slot play`, expiry text, and primary `PLAY NOW` button.
+  - Carousel dots under the recommended card.
+- Available Offers section:
+  - Appears before `Ready now`, not after `Expiring soon`.
+  - Section title `Available offers` with right-aligned `View all (3)`.
+  - Featured World Cup offer card with:
+    - `FEATURED` label.
+    - `Eligible` badge.
+    - Title `World Cup Welcome Offer`.
+    - Value text `100% up to EUR 100 Bonus + EUR 20 Free Bet`.
+    - Primary green `OPT IN` button.
+    - Secondary `View rules` action.
+- Ready Now section:
+  - Two side-by-side cards on desktop/drawer width.
+  - Sports card with green styling and `USE NOW`.
+  - Casino card with purple styling and `PLAY NOW`.
+  - Expiry text is visible and urgent where relevant.
+  - Carousel/scroll indicator appears below the card row.
+- In Progress section:
+  - Mission-style card for `Weekly Reward`.
+  - Progress bar and progress text such as `2 of 3` and `67%`.
+  - Gift/action icon on the right.
+- Expiring Soon section:
+  - Compact row/card for `Poker Ticket`.
+  - Product badge, value/description, urgent expiry countdown, and chevron affordance.
+
+### Screen 2: Opt In Opens Cashier
+
+Clicking `OPT IN` on the World Cup offer should not complete the reward immediately. It should open the Cashier deposit flow with the reward already applied.
+
+- Cashier is a full slide-out panel or replaces the current drawer in the same right-side overlay position.
+- Header:
+  - Orange `888` mark.
+  - Title `Cashier`.
+  - Balance line with cash and bonus amounts.
+  - Promo badge such as `KICKOFF`.
+  - Close button.
+- Tabs:
+  - `Deposit` active.
+  - `Withdrawal`, `History`, `Limits`, and `Responsible Gaming` shown as inactive tabs.
+- Payment method row:
+  - Visa / MC selected.
+  - Skrill, LuxonPay, Neteller as alternatives.
+- Step 1, deposit amount:
+  - Deposit amount grid with `EUR 30`, `EUR 50`, `EUR 100`, `EUR 200`, `EUR 500`, `Other`.
+  - `EUR 30` selected and labelled as qualifying.
+- Step 2, applied reward:
+  - Reward applied card with green outline/tone.
+  - Title `World Cup Welcome Offer`.
+  - Promo code `KICKOFF`, marked as added automatically.
+  - Benefit chips such as `Up to EUR 75 Casino Bonus` and `EUR 30 Sports Free Bets`.
+  - Qualifying deposit text such as `Deposit EUR 30 or more to qualify`.
+  - `View rules` and `Remove reward` actions.
+- Step 3, payment information:
+  - Card number, security code, and cardholder name fields.
+  - Values may be mock/demo-only.
+- Sticky cashier footer:
+  - Deposit amount, promo code, and reward summary.
+  - SSL/encrypted trust indicators.
+  - Primary orange `Deposit EUR 30` button.
+
+### Screen 3: Deposit Confirmation
+
+Clicking `Deposit EUR 30` should show a centered confirmation modal over a dimmed cashier background.
+
+- Confirmation modal:
+  - Green success/check icon.
+  - Title `Deposit Confirmed`.
+  - Amount `EUR 30` in large amber text.
+  - Message that the World Cup Welcome Offer has been applied and rewards are waiting in Rewards Centre.
+  - Primary green `View in Rewards Centre` button with gift icon.
+  - Secondary `Close cashier` action.
+- `View in Rewards Centre` should return to the Rewards Centre drawer.
+- Returning to Rewards Centre should update the visible state:
+  - The World Cup offer should no longer look like a fresh available offer.
+  - The relevant reward should appear as applied/ready according to the frontend fallback model.
+  - Summary counts should reflect the local state where feasible.
+  - A success/confirmation state may be shown without adding backend writes.
+
 ## Constraints
 
 - Keep `RewardsHub` as a separate frontend project inside this repository.
@@ -290,6 +391,10 @@ The drawer should be composed in the same order as the Figma design.
     <RecommendedRewardCard />
   </RewardsSection>
 
+  <RewardsSection title="Available offers">
+    <AvailableOfferCard />
+  </RewardsSection>
+
   <RewardsSection title="Ready now">
     <ReadyRewardCard />
   </RewardsSection>
@@ -302,12 +407,23 @@ The drawer should be composed in the same order as the Figma design.
     <RewardRow variant="expiring" />
   </RewardsSection>
 
-  <RewardsSection title="Available offers">
-    <AvailableOfferCard />
-  </RewardsSection>
-
   <DrawerFooterCta />
 </RewardsCentreDrawer>
+```
+
+Opt-in and cashier surfaces should be composed as:
+
+```tsx
+<CashierDrawer>
+  <CashierHeader />
+  <CashierTabs activeTab="Deposit" />
+  <PaymentMethodSelector />
+  <DepositAmountSelector selectedAmount={30} />
+  <AppliedRewardCard reward={worldCupOffer} promoCode="KICKOFF" />
+  <PaymentInformationForm />
+  <CashierDepositFooter />
+  <DepositConfirmationModal />
+</CashierDrawer>
 ```
 
 ## Component Responsibilities
@@ -328,6 +444,15 @@ The drawer should be composed in the same order as the Figma design.
 | `DrawerFooterCta` | Bottom link or button to the full rewards hub if present in Figma |
 | `RewardsEntryWidget` | My Account card/entry point that uses `/widget` or `/entry-point` data and opens the drawer |
 | `CashierRewardsPanel` | Cashier reward selector/list that uses `/cashier/rewards/eligible` and local mock apply state |
+| `CashierDrawer` | Figma-aligned cashier deposit panel opened from offer opt-in |
+| `CashierHeader` | Cashier title, balances, promo badge, and close control |
+| `CashierTabs` | Deposit/Withdrawal/History/Limits/Responsible Gaming navigation row |
+| `PaymentMethodSelector` | Payment method pills with Visa / MC selected |
+| `DepositAmountSelector` | Fixed deposit amount grid with qualifying state on EUR 30 |
+| `AppliedRewardCard` | Reward applied card for World Cup offer, promo code, benefits, rules/remove actions |
+| `PaymentInformationForm` | Mock card input area for the deposit form |
+| `CashierDepositFooter` | Sticky footer with summary and orange deposit CTA |
+| `DepositConfirmationModal` | Success modal with `View in Rewards Centre` return action |
 
 ## Data Grouping Rules
 
@@ -372,12 +497,12 @@ The first implementation should include:
   - `MockApply`: show local confirmation and update the card state.
   - `ViewDetails`: open a detail placeholder or log the selected reward.
 - Available-offer opt-in handling:
-  - The visible primary CTA in the Available Offers section must be `Opt in`, even when backend mock data returns a more specific action label such as `Claim offer` or `Apply reward`.
-  - Selecting `Opt in` expands an inline flow directly beneath that offer card.
-  - The expanded flow shows concise offer value, minimum deposit when present, wagering requirement when present, expiry, and key restrictions.
-  - The expanded flow exposes `Confirm opt in` and `Cancel`.
-  - Confirming calls the existing local `MockApply` behavior and stores the reward id in `appliedRewardIds`.
-  - Applied offers stay visible and switch to an applied/success state; do not remove them from the Available Offers section after opt-in.
+  - The visible primary CTA in the Available Offers section must be `OPT IN`.
+  - Selecting `OPT IN` on the World Cup offer opens the Cashier drawer with that reward already applied.
+  - The Cashier drawer controls the deposit flow; opt-in is completed only after the user clicks `Deposit EUR 30`.
+  - Deposit confirmation presents the success modal from the Figma screenshot.
+  - `View in Rewards Centre` closes Cashier, returns to Rewards Centre, and updates local reward state.
+  - Applied offers should not be treated as fresh available offers after the deposit confirmation.
 - Do not block drawer rendering if one optional section has no data.
 
 ## Styling Implementation Notes
@@ -468,7 +593,15 @@ VITE_REWARDS_API_BASE_URL=http://localhost:5136
 - Add view-all placeholders.
 - Add CTA behavior for deep links and mock apply actions.
 - Add local confirmation/success state for opt-in style actions.
-- Add inline Available Offers opt-in flow with `Opt in`, `Confirm opt in`, `Cancel`, and applied success state.
+- Add Figma cashier opt-in flow: `OPT IN` opens Cashier, `Deposit EUR 30` opens confirmation, `View in Rewards Centre` returns with updated local reward state.
+
+### Phase 5B: Cashier Deposit Flow
+
+- Add `CashierDrawer` opened from `AvailableOfferCard`.
+- Add cashier header, tabs, payment method selector, deposit amount selector, applied reward card, payment details, sticky footer, and confirmation modal.
+- Keep the flow frontend-local for MVP; do not add backend write endpoints.
+- Use `GET /api/v1/cashier/rewards/eligible` and existing reward action metadata to populate the applied reward.
+- On deposit confirmation, mark the offer as applied locally and update Rewards Centre view/counts where feasible.
 
 ### Phase 5A: Figma Supporting Surfaces
 
@@ -487,6 +620,9 @@ VITE_REWARDS_API_BASE_URL=http://localhost:5136
 - Verify API mode once the backend endpoints exist.
 - Verify the My Account widget uses `/widget` or `/entry-point` data rather than hardcoded labels if implemented.
 - Verify the cashier surface uses only read-only eligible reward data if implemented.
+- Verify `OPT IN` opens Cashier with the World Cup offer applied.
+- Verify `Deposit EUR 30` opens the confirmation modal.
+- Verify `View in Rewards Centre` returns to Rewards Centre and updates offer/reward state.
 
 ## Open Questions
 
@@ -513,5 +649,6 @@ VITE_REWARDS_API_BASE_URL=http://localhost:5136
 - [ ] Include temporary fallback data only as a development aid.
 - [ ] Implement loading, empty, disabled, and fallback states.
 - [ ] Implement the Figma Available Offers opt-in flow.
+- [ ] Implement the Figma Cashier deposit and confirmation flow.
 - [ ] Keep applied available offers visible after opt-in.
 - [ ] Match the Figma drawer closely enough for demo use.
