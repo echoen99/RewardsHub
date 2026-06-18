@@ -85,6 +85,21 @@ function App() {
     setStatusMessage('Not yet implemented.');
   }
 
+  function handleOpenCashier() {
+    const defaultCashierOffer =
+      data.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ??
+      fallbackRewardsHubData.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible);
+
+    if (!defaultCashierOffer) {
+      setStatusMessage('Cashier is not available.');
+      return;
+    }
+
+    setCashierOffer(defaultCashierOffer);
+    setIsDrawerOpen(false);
+    setStatusMessage(null);
+  }
+
   return (
     <main className="app-shell">
       <div className="host-page">
@@ -94,6 +109,9 @@ function App() {
             <span>RewardsHub</span>
             <h1>My Account</h1>
             <p>{data.entryPoint.message}</p>
+            <button type="button" className="host-page__deposit-action" onClick={handleOpenCashier}>
+              Deposit
+            </button>
           </div>
 
           <div className="host-page__grid">

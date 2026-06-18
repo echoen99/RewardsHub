@@ -93,6 +93,21 @@ button:disabled {
   font-size: 14px;
 }
 
+.host-page__deposit-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 18px;
+  color: #031008;
+  background: var(--color-green);
+  font-size: 14px;
+  font-weight: 900;
+}
+
 .host-page__grid {
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(320px, 1fr);
