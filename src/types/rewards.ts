@@ -120,6 +120,29 @@ export type CashierEligibleReward = {
   cashierAction: RewardAction;
 };
 
+export type DemoOperationResult = {
+  rewardId: string;
+  status: RewardStatus;
+  message: string;
+};
+
+export type ConfirmDepositRequest = {
+  playerId: string;
+  amount: number;
+  currency: string;
+  rewardId: string | null;
+  promoCode: string | null;
+};
+
+export type ConfirmDepositResponse = {
+  depositId: string;
+  amount: number;
+  currency: string;
+  rewardId: string | null;
+  status: string;
+  message: string;
+};
+
 export type RewardsWidgetBadgeTone = 'Success' | 'Warning' | 'Neutral';
 
 export type RewardsWidget = {

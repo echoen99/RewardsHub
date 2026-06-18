@@ -19,7 +19,9 @@ type CashierDrawerProps = {
   availableOffer: Reward | null;
   player: Player;
   onClose: () => void;
-  onViewRewardsCentre: (offer: Reward | null) => void;
+  onViewRewardsCentre: (offer: Reward | null, amount: number) => void;
+  onApplyOffer?: (offer: Reward) => Promise<void> | void;
+  onRemoveOffer?: (offer: Reward) => Promise<void> | void;
 };
 
 const depositAmounts = [30, 50, 100, 200, 500];
@@ -32,10 +34,28 @@ const cashierTabs = [
   { label: 'Responsible Gaming', intent: 'would open safer gaming tools', active: false }
 ];
 
-export function CashierDrawer({ offer, availableOffer, player, onClose, onViewRewardsCentre }: CashierDrawerProps) {
+export function CashierDrawer({
+  offer,
+  availableOffer,
+  player,
+  onClose,
+  onViewRewardsCentre,
+  onApplyOffer,
+  onRemoveOffer
+}: CashierDrawerProps) {
   const [selectedAmount, setSelectedAmount] = useState(30);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [appliedOffer, setAppliedOffer] = useState<Reward | null>(offer);
+
+  async function handleApplyOffer(nextOffer: Reward) {
+    await onApplyOffer?.(nextOffer);
+    setAppliedOffer(nextOffer);
+  }
+
+  async function handleRemoveOffer(nextOffer: Reward) {
+    await onRemoveOffer?.(nextOffer);
+    setAppliedOffer(null);
+  }
 
   return (
     <aside className="cashier-drawer" aria-label="Cashier">
@@ -144,7 +164,7 @@ export function CashierDrawer({ offer, availableOffer, player, onClose, onViewRe
               <p>Deposit €30 or more to qualify</p>
               <div className="applied-reward-card__actions">
                 <button type="button" title="would show offer rules">View rules</button>
-                <button type="button" title="remove applied reward" onClick={() => setAppliedOffer(null)}>
+                <button type="button" title="remove applied reward" onClick={() => handleRemoveOffer(appliedOffer)}>
                   Remove reward
                 </button>
               </div>
@@ -169,7 +189,7 @@ export function CashierDrawer({ offer, availableOffer, player, onClose, onViewRe
                   <h3>{getRewardDisplayTitle(availableOffer)}</h3>
                   <p>{getRewardDisplayDescription(availableOffer)}</p>
                 </div>
-                <button type="button" className="offer-opt-in-action" onClick={() => setAppliedOffer(availableOffer)}>
+                <button type="button" className="offer-opt-in-action" onClick={() => handleApplyOffer(availableOffer)}>
                   OPT IN
                 </button>
               </div>
@@ -245,7 +265,11 @@ export function CashierDrawer({ offer, availableOffer, player, onClose, onViewRe
                 ? `Your ${getRewardDisplayTitle(appliedOffer)} has been applied. Your rewards are waiting in Rewards Centre.`
                 : 'Your deposit has been confirmed.'}
             </p>
-            <button type="button" className="view-rewards-action" onClick={() => onViewRewardsCentre(appliedOffer)}>
+            <button
+              type="button"
+              className="view-rewards-action"
+              onClick={() => onViewRewardsCentre(appliedOffer, selectedAmount)}
+            >
               <Gift size={15} />
               View in Rewards Centre
             </button>

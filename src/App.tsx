@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { getRewardsHubData } from './api/rewardsApi';
+import {
+  applyCashierReward,
+  confirmCashierDeposit,
+  getRewardsHubData,
+  optInReward,
+  removeCashierReward,
+  resetRewardsDemoState
+} from './api/rewardsApi';
 import { CashierDrawer } from './components/CashierDrawer';
 import { CashierRewardsPanel } from './components/CashierRewardsPanel';
 import { RewardsEntryWidget } from './components/RewardsEntryWidget';
@@ -19,28 +26,53 @@ function App() {
   const [isCashierOpen, setIsCashierOpen] = useState(false);
   const [shouldReturnToRewardsAfterCashier, setShouldReturnToRewardsAfterCashier] = useState(false);
 
+  function getAppliedRewardIds(rewardsData: RewardsHubData) {
+    return rewardsData.cashierRewards.filter((reward) => reward.status === 'Applied').map((reward) => reward.rewardId);
+  }
+
   useEffect(() => {
     let isMounted = true;
 
-    getRewardsHubData().then((rewardsData) => {
-      if (isMounted) {
-        setData(rewardsData);
-        setIsUsingFallback(rewardsData === fallbackRewardsHubData);
-        setIsLoading(false);
-      }
-    });
+    resetRewardsDemoState()
+      .catch((error) => {
+        console.warn('Rewards API demo reset unavailable.', error);
+      })
+      .then(() => getRewardsHubData())
+      .then((rewardsData) => {
+        if (isMounted) {
+          setData(rewardsData);
+          setIsUsingFallback(rewardsData === fallbackRewardsHubData);
+          setAppliedRewardIds(getAppliedRewardIds(rewardsData));
+          setIsLoading(false);
+        }
+      });
 
     return () => {
       isMounted = false;
     };
   }, []);
 
-  function handleRewardAction(reward: Reward) {
+  async function refreshRewardsData() {
+    const rewardsData = await getRewardsHubData();
+    setData(rewardsData);
+    setIsUsingFallback(rewardsData === fallbackRewardsHubData);
+    setAppliedRewardIds(getAppliedRewardIds(rewardsData));
+    return rewardsData;
+  }
+
+  async function handleRewardAction(reward: Reward) {
     if (!reward.action.enabled) {
       return;
     }
 
     if (reward.status === 'AvailableOffer' && reward.isCashierEligible) {
+      try {
+        await optInReward(reward.rewardId);
+        await refreshRewardsData();
+      } catch (error) {
+        console.warn('Unable to opt in reward through API.', error);
+      }
+
       setCashierOffer(reward);
       setIsCashierOpen(true);
       setShouldReturnToRewardsAfterCashier(true);
@@ -65,7 +97,20 @@ function App() {
     setStatusMessage(`${getRewardDisplayTitle(reward)}: ${getRewardActionIntent(reward)}.`);
   }
 
-  function handleDepositConfirmed(reward: Reward | null) {
+  async function handleDepositConfirmed(reward: Reward | null, amount: number) {
+    try {
+      await confirmCashierDeposit({
+        playerId: data.player.playerId,
+        amount,
+        currency: data.player.currency,
+        rewardId: reward?.rewardId ?? null,
+        promoCode: reward ? 'KICKOFF' : null
+      });
+      await refreshRewardsData();
+    } catch (error) {
+      console.warn('Unable to confirm cashier deposit through API.', error);
+    }
+
     if (reward) {
       setAppliedRewardIds((currentIds) =>
         currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
@@ -83,14 +128,21 @@ function App() {
     );
   }
 
-  function handleCashierApply(reward: CashierEligibleReward) {
+  async function handleCashierApply(reward: CashierEligibleReward) {
     if (!reward.cashierAction.enabled) {
       return;
     }
 
-    setAppliedRewardIds((currentIds) =>
-      currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
-    );
+    try {
+      await applyCashierReward(reward.rewardId);
+      await refreshRewardsData();
+    } catch (error) {
+      console.warn('Unable to apply cashier reward through API.', error);
+      setAppliedRewardIds((currentIds) =>
+        currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
+      );
+    }
+
     setStatusMessage(reward.cashierAction.confirmationMessage ?? `${reward.title} applied.`);
   }
 
@@ -99,15 +151,6 @@ function App() {
   }
 
   function handleOpenCashier() {
-    const defaultCashierOffer =
-      data.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ??
-      fallbackRewardsHubData.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible);
-
-    if (!defaultCashierOffer) {
-      setStatusMessage('Cashier is not available.');
-      return;
-    }
-
     setCashierOffer(null);
     setIsCashierOpen(true);
     setShouldReturnToRewardsAfterCashier(false);
@@ -116,9 +159,7 @@ function App() {
   }
 
   const defaultCashierOffer =
-    data.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ??
-    fallbackRewardsHubData.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ??
-    null;
+    data.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ?? null;
 
   return (
     <main className="app-shell">
@@ -161,6 +202,22 @@ function App() {
               setStatusMessage(null);
             }}
             onViewRewardsCentre={handleDepositConfirmed}
+            onApplyOffer={async (offer) => {
+              try {
+                await applyCashierReward(offer.rewardId);
+                await refreshRewardsData();
+              } catch (error) {
+                console.warn('Unable to apply cashier drawer reward through API.', error);
+              }
+            }}
+            onRemoveOffer={async (offer) => {
+              try {
+                await removeCashierReward(offer.rewardId);
+                await refreshRewardsData();
+              } catch (error) {
+                console.warn('Unable to remove cashier drawer reward through API.', error);
+              }
+            }}
           />
         </div>
       ) : null}

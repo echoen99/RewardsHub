@@ -1,6 +1,9 @@
 import { fallbackRewardsHubData } from '../data/fallbackRewards';
 import type {
   CashierEligibleReward,
+  ConfirmDepositRequest,
+  ConfirmDepositResponse,
+  DemoOperationResult,
   EntryPoint,
   Player,
   Reward,
@@ -17,6 +20,30 @@ const playerId = import.meta.env.VITE_REWARDS_PLAYER_ID ?? '12345';
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`);
+
+  if (!response.ok) {
+    throw new Error(`Rewards API returned ${response.status} for ${path}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+async function postJson<T>(path: string, body?: unknown): Promise<T> {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
+    method: 'POST',
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Rewards API returned ${response.status} for ${path}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+async function deleteJson<T>(path: string): Promise<T> {
+  const response = await fetch(`${apiBaseUrl}${path}`, { method: 'DELETE' });
 
   if (!response.ok) {
     throw new Error(`Rewards API returned ${response.status} for ${path}`);
@@ -52,4 +79,24 @@ export async function getRewardDetails(rewardId: string): Promise<Reward> {
 
 export async function getCashierEligibleRewards(): Promise<CashierEligibleReward[]> {
   return getJson<CashierEligibleReward[]>('/api/v1/cashier/rewards/eligible');
+}
+
+export async function resetRewardsDemoState(): Promise<void> {
+  await postJson<{ message: string }>('/api/v1/demo/reset');
+}
+
+export async function optInReward(rewardId: string): Promise<DemoOperationResult> {
+  return postJson<DemoOperationResult>(`/api/v1/rewards-centre/rewards/${encodeURIComponent(rewardId)}/opt-in`);
+}
+
+export async function applyCashierReward(rewardId: string): Promise<DemoOperationResult> {
+  return postJson<DemoOperationResult>(`/api/v1/cashier/rewards/${encodeURIComponent(rewardId)}/apply`);
+}
+
+export async function removeCashierReward(rewardId: string): Promise<DemoOperationResult> {
+  return deleteJson<DemoOperationResult>(`/api/v1/cashier/rewards/${encodeURIComponent(rewardId)}/apply`);
+}
+
+export async function confirmCashierDeposit(request: ConfirmDepositRequest): Promise<ConfirmDepositResponse> {
+  return postJson<ConfirmDepositResponse>('/api/v1/cashier/deposits', request);
 }
