@@ -1532,6 +1532,79 @@ button:disabled {
   margin: 0;
 }
 
+.cashier-available-offer {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cashier-available-offer__flag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 12px 0;
+}
+
+.cashier-available-offer__flag span,
+.cashier-available-offer__flag strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.cashier-available-offer__flag span {
+  color: var(--color-amber);
+  text-transform: uppercase;
+}
+
+.cashier-available-offer__flag strong {
+  border: 1px solid rgba(53, 223, 119, 0.26);
+  border-radius: 999px;
+  padding: 4px 7px;
+  color: #bffbd3;
+  background: rgba(53, 223, 119, 0.1);
+}
+
+.cashier-available-offer__summary {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+}
+
+.cashier-available-offer__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(245, 196, 81, 0.22);
+  border-radius: 8px;
+  color: var(--color-amber);
+  background: rgba(245, 196, 81, 0.09);
+}
+
+.cashier-available-offer h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.cashier-available-offer p {
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .applied-reward-card__actions {
   display: flex;
   gap: 14px;

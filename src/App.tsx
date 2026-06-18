@@ -16,6 +16,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [cashierOffer, setCashierOffer] = useState<Reward | null>(null);
+  const [isCashierOpen, setIsCashierOpen] = useState(false);
+  const [shouldReturnToRewardsAfterCashier, setShouldReturnToRewardsAfterCashier] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -40,6 +42,8 @@ function App() {
 
     if (reward.status === 'AvailableOffer' && reward.isCashierEligible) {
       setCashierOffer(reward);
+      setIsCashierOpen(true);
+      setShouldReturnToRewardsAfterCashier(true);
       setIsDrawerOpen(false);
       setStatusMessage(null);
       return;
@@ -61,13 +65,22 @@ function App() {
     setStatusMessage(`${getRewardDisplayTitle(reward)}: ${getRewardActionIntent(reward)}.`);
   }
 
-  function handleDepositConfirmed(reward: Reward) {
-    setAppliedRewardIds((currentIds) =>
-      currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
-    );
+  function handleDepositConfirmed(reward: Reward | null) {
+    if (reward) {
+      setAppliedRewardIds((currentIds) =>
+        currentIds.includes(reward.rewardId) ? currentIds : [...currentIds, reward.rewardId]
+      );
+    }
+
     setCashierOffer(null);
+    setIsCashierOpen(false);
+    setShouldReturnToRewardsAfterCashier(false);
     setIsDrawerOpen(true);
-    setStatusMessage(`${getRewardDisplayTitle(reward)} applied. Your rewards are waiting in Rewards Centre.`);
+    setStatusMessage(
+      reward
+        ? `${getRewardDisplayTitle(reward)} applied. Your rewards are waiting in Rewards Centre.`
+        : 'Deposit confirmed. Rewards Centre is open.'
+    );
   }
 
   function handleCashierApply(reward: CashierEligibleReward) {
@@ -95,10 +108,17 @@ function App() {
       return;
     }
 
-    setCashierOffer(defaultCashierOffer);
+    setCashierOffer(null);
+    setIsCashierOpen(true);
+    setShouldReturnToRewardsAfterCashier(false);
     setIsDrawerOpen(false);
     setStatusMessage(null);
   }
+
+  const defaultCashierOffer =
+    data.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ??
+    fallbackRewardsHubData.rewards.find((reward) => reward.status === 'AvailableOffer' && reward.isCashierEligible) ??
+    null;
 
   return (
     <main className="app-shell">
@@ -127,21 +147,25 @@ function App() {
         </div>
       </div>
 
-      {cashierOffer ? (
+      {isCashierOpen ? (
         <div className="drawer-overlay">
           <CashierDrawer
             offer={cashierOffer}
+            availableOffer={defaultCashierOffer}
             player={data.player}
             onClose={() => {
               setCashierOffer(null);
-              setIsDrawerOpen(true);
+              setIsCashierOpen(false);
+              setIsDrawerOpen(shouldReturnToRewardsAfterCashier);
+              setShouldReturnToRewardsAfterCashier(false);
+              setStatusMessage(null);
             }}
             onViewRewardsCentre={handleDepositConfirmed}
           />
         </div>
       ) : null}
 
-      {isDrawerOpen && !cashierOffer ? (
+      {isDrawerOpen && !isCashierOpen ? (
         <div className="drawer-overlay">
           <RewardsCentreDrawer
             data={data}

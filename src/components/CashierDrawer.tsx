@@ -4,19 +4,22 @@ import {
   Gift,
   HeartHandshake,
   History,
+  Info,
   Lock,
   ShieldCheck,
-  X
+  X,
+  Zap
 } from 'lucide-react';
 import { useState } from 'react';
 import type { Player, Reward } from '../types/rewards';
-import { formatCurrencyAmount, getRewardDisplayTitle } from '../utils/rewardDisplay';
+import { formatCurrencyAmount, getRewardDisplayDescription, getRewardDisplayTitle } from '../utils/rewardDisplay';
 
 type CashierDrawerProps = {
-  offer: Reward;
+  offer: Reward | null;
+  availableOffer: Reward | null;
   player: Player;
   onClose: () => void;
-  onViewRewardsCentre: (offer: Reward) => void;
+  onViewRewardsCentre: (offer: Reward | null) => void;
 };
 
 const depositAmounts = [30, 50, 100, 200, 500];
@@ -29,9 +32,10 @@ const cashierTabs = [
   { label: 'Responsible Gaming', intent: 'would open safer gaming tools', active: false }
 ];
 
-export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: CashierDrawerProps) {
+export function CashierDrawer({ offer, availableOffer, player, onClose, onViewRewardsCentre }: CashierDrawerProps) {
   const [selectedAmount, setSelectedAmount] = useState(30);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [appliedOffer, setAppliedOffer] = useState<Reward | null>(offer);
 
   return (
     <aside className="cashier-drawer" aria-label="Cashier">
@@ -113,35 +117,69 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
         <section className="cashier-step" aria-labelledby="applied-reward-title">
           <div className="cashier-step__label">
             <span>2</span>
-            <h2 id="applied-reward-title">Applied reward</h2>
+            <h2 id="applied-reward-title">{appliedOffer ? 'Applied reward' : 'Available offer'}</h2>
           </div>
-          <article className="applied-reward-card">
-            <div className="applied-reward-card__header">
-              <span>
-                <Gift size={16} />
-                Reward applied
-              </span>
-              <strong>
-                <CheckCircle size={13} />
-                Applied
-              </strong>
-            </div>
-            <h3>{getRewardDisplayTitle(offer)}</h3>
-            <div className="promo-code-row">
-              <span>Promo code</span>
-              <strong>KICKOFF</strong>
-              <em>added automatically</em>
-            </div>
-            <div className="benefit-grid">
-              <span>Up to €75 Casino Bonus</span>
-              <span>€30 Sports Free Bets</span>
-            </div>
-            <p>Deposit €30 or more to qualify</p>
-            <div className="applied-reward-card__actions">
-              <button type="button" title="would show offer rules">View rules</button>
-              <button type="button" title="would remove applied reward">Remove reward</button>
-            </div>
-          </article>
+          {appliedOffer ? (
+            <article className="applied-reward-card">
+              <div className="applied-reward-card__header">
+                <span>
+                  <Gift size={16} />
+                  Reward applied
+                </span>
+                <strong>
+                  <CheckCircle size={13} />
+                  Applied
+                </strong>
+              </div>
+              <h3>{getRewardDisplayTitle(appliedOffer)}</h3>
+              <div className="promo-code-row">
+                <span>Promo code</span>
+                <strong>KICKOFF</strong>
+                <em>added automatically</em>
+              </div>
+              <div className="benefit-grid">
+                <span>Up to €75 Casino Bonus</span>
+                <span>€30 Sports Free Bets</span>
+              </div>
+              <p>Deposit €30 or more to qualify</p>
+              <div className="applied-reward-card__actions">
+                <button type="button" title="would show offer rules">View rules</button>
+                <button type="button" title="remove applied reward" onClick={() => setAppliedOffer(null)}>
+                  Remove reward
+                </button>
+              </div>
+            </article>
+          ) : availableOffer ? (
+            <article className="cashier-available-offer">
+              <div className="cashier-available-offer__flag">
+                <span>
+                  <Zap size={12} />
+                  Featured
+                </span>
+                <strong>
+                  <CheckCircle size={12} />
+                  Eligible
+                </strong>
+              </div>
+              <div className="cashier-available-offer__summary">
+                <div className="cashier-available-offer__icon" aria-hidden="true">
+                  <Info size={17} />
+                </div>
+                <div>
+                  <h3>{getRewardDisplayTitle(availableOffer)}</h3>
+                  <p>{getRewardDisplayDescription(availableOffer)}</p>
+                </div>
+                <button type="button" className="offer-opt-in-action" onClick={() => setAppliedOffer(availableOffer)}>
+                  OPT IN
+                </button>
+              </div>
+              <button type="button" className="available-offer__disclosure" title="would show offer rules">
+                View rules
+              </button>
+            </article>
+          ) : (
+            <p className="empty-state">No available offers for this deposit.</p>
+          )}
         </section>
 
         <section className="cashier-step" aria-labelledby="payment-info-title">
@@ -176,8 +214,8 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
         </div>
         <div>
           <span>Promo</span>
-          <strong>KICKOFF</strong>
-          <small>You get €75 Bonus + €30 Free Bets</small>
+          <strong>{appliedOffer ? 'KICKOFF' : 'None selected'}</strong>
+          <small>{appliedOffer ? 'You get €75 Bonus + €30 Free Bets' : 'Opt in to an offer above'}</small>
         </div>
         <div className="cashier-footer__trust">
           <span>
@@ -202,8 +240,12 @@ export function CashierDrawer({ offer, player, onClose, onViewRewardsCentre }: C
             </div>
             <h2 id="deposit-confirmed-title">Deposit Confirmed</h2>
             <strong>{formatCurrencyAmount(selectedAmount)}</strong>
-            <p>Your {getRewardDisplayTitle(offer)} has been applied. Your rewards are waiting in Rewards Centre.</p>
-            <button type="button" className="view-rewards-action" onClick={() => onViewRewardsCentre(offer)}>
+            <p>
+              {appliedOffer
+                ? `Your ${getRewardDisplayTitle(appliedOffer)} has been applied. Your rewards are waiting in Rewards Centre.`
+                : 'Your deposit has been confirmed.'}
+            </p>
+            <button type="button" className="view-rewards-action" onClick={() => onViewRewardsCentre(appliedOffer)}>
               <Gift size={15} />
               View in Rewards Centre
             </button>
