@@ -171,6 +171,52 @@ Clicking `Deposit EUR 30` should show a centered confirmation modal over a dimme
 - Make fallback data match the API model, so removing it later is low-risk.
 - Match the Figma drawer first; avoid adding unrelated navigation, hero content, or explanation text.
 
+## Experimental Live Update Branch Plan
+
+The current `main` branch is the safe demo version. Any real read/write integration work should happen on a paired experiment branch in both repositories:
+
+```text
+RewardsHub: feature/live-rewards-updates
+Rewards:    feature/live-rewards-updates
+```
+
+Goals for the experiment:
+
+- Keep the Figma-aligned UI behavior, layout, and demo-safe fallback data intact.
+- Replace local-only state transitions with API-backed reads and writes where feasible.
+- Let the UI refresh from the backend after a reward is opted in, applied in cashier, removed, or otherwise updated.
+- Preserve fallback behavior so the frontend can still run if the experimental backend is unavailable.
+- Do not merge to `main` until both projects are verified together and explicitly approved.
+
+Frontend responsibilities on the branch:
+
+- Add write-capable API helpers beside the existing read helpers.
+- Keep optimistic UI updates small and reversible.
+- Re-fetch rewards, overview, cashier eligible rewards, and progress after successful writes.
+- Show compact success/error toasts without changing Figma CTA labels.
+- Keep direct My Account `Deposit` behavior distinct from Rewards Centre `OPT IN`:
+  - My Account `Deposit` opens Cashier with eligible offers available for selection.
+  - Rewards Centre `OPT IN` opens Cashier with the selected offer already applied.
+- Continue to support fallback data when write endpoints are missing or unavailable.
+
+Expected experimental write operations:
+
+```http
+POST /api/v1/rewards-centre/rewards/{rewardId}/opt-in
+POST /api/v1/cashier/rewards/{rewardId}/apply
+DELETE /api/v1/cashier/rewards/{rewardId}/apply
+POST /api/v1/cashier/deposits
+```
+
+Each successful write should return enough state for the UI to update immediately or should be followed by read refreshes from:
+
+```http
+GET /api/v1/rewards-centre/overview
+GET /api/v1/rewards-centre/rewards
+GET /api/v1/rewards-centre/progress
+GET /api/v1/cashier/rewards/eligible
+```
+
 ## Visual Design Direction From Figma
 
 The UI should be implemented as a compact dark slide-out panel.
@@ -624,6 +670,19 @@ VITE_REWARDS_API_BASE_URL=http://localhost:5136
 - Verify `Deposit EUR 30` opens the confirmation modal.
 - Verify `View in Rewards Centre` returns to Rewards Centre and updates offer/reward state.
 
+### Phase 7: Experimental Live Read/Write Integration
+
+This phase belongs only on the paired `feature/live-rewards-updates` branches.
+
+- Create and push `feature/live-rewards-updates` in both `RewardsHub` and `Rewards`.
+- Add frontend API helpers for opt-in, cashier apply/remove, and deposit confirmation.
+- Update `App.tsx` state flow so write operations call the backend first.
+- Re-fetch rewards/overview/progress/cashier eligible rewards after successful writes.
+- Keep local fallback mode for demo resilience.
+- Verify that direct My Account `Deposit` opens Cashier with available offers, while Rewards Centre `OPT IN` opens Cashier with the selected offer applied.
+- Verify that opt-in/apply/remove/deposit changes are visible after refresh, not only in local React state.
+- Do not merge to `main` until both repos pass build/run verification together.
+
 ## Open Questions
 
 1. Should the drawer header be sticky while the reward list scrolls?
@@ -635,6 +694,9 @@ VITE_REWARDS_API_BASE_URL=http://localhost:5136
 7. Should the demo start from the My Account widget or show the slide-out drawer open by default?
 8. Should cashier eligible rewards be part of the first demo path, or remain a secondary route/component?
 9. Are Welcome Cashier, Direct Cashier, and Notifications required for this hackathon demo, or only present as Figma context?
+10. For live updates, should the backend persist changes in memory only, or write them back to mock JSON files?
+11. Should deposit confirmation create a history item immediately, or only change reward status?
+12. Should cashier offer selection and Rewards Centre opt-in share the same backend state transition?
 
 ## Approval Checklist
 
@@ -652,3 +714,5 @@ VITE_REWARDS_API_BASE_URL=http://localhost:5136
 - [ ] Implement the Figma Cashier deposit and confirmation flow.
 - [ ] Keep applied available offers visible after opt-in.
 - [ ] Match the Figma drawer closely enough for demo use.
+- [ ] Keep live read/write work isolated to `feature/live-rewards-updates`.
+- [ ] Re-fetch frontend state after successful backend writes.
