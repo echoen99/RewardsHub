@@ -1,7 +1,7 @@
 import type { Reward } from '../types/rewards';
 
 export function getRewardDisplayTitle(reward: Pick<Reward, 'title' | 'rewardType'>) {
-  if (reward.rewardType === 'DepositOffer' && reward.title.toLowerCase().includes('world cup')) {
+  if (isWorldCupOffer(reward)) {
     return 'World Cup Welcome Offer';
   }
 
@@ -47,7 +47,7 @@ export function getRewardActionIntent(reward: Reward) {
 }
 
 export function getRewardDisplayValue(reward: Reward) {
-  if (reward.rewardType === 'DepositOffer' && getRewardDisplayTitle(reward) === 'World Cup Welcome Offer') {
+  if (isWorldCupOffer(reward)) {
     return '100% up to €100 Bonus + €20 Free Bet';
   }
 
@@ -55,7 +55,7 @@ export function getRewardDisplayValue(reward: Reward) {
 }
 
 export function getRewardDisplayDescription(reward: Reward) {
-  if (reward.rewardType === 'DepositOffer' && getRewardDisplayTitle(reward) === 'World Cup Welcome Offer') {
+  if (isWorldCupOffer(reward)) {
     return '100% up to €100 Bonus + €20 Free Bet';
   }
 
@@ -115,4 +115,8 @@ function formatDuration(milliseconds: number) {
   const seconds = totalSeconds % 60;
 
   return [hours, minutes, seconds].map((value) => String(value).padStart(2, '0')).join(':');
+}
+
+function isWorldCupOffer(reward: Pick<Reward, 'title' | 'rewardType'>) {
+  return reward.rewardType === 'DepositOffer' && reward.title.toLowerCase().includes('world cup');
 }

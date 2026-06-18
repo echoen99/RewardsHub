@@ -147,7 +147,7 @@ function toFigmaRecommendedReward(reward: Reward): Reward {
 }
 
 function toFigmaAvailableOffer(reward: Reward): Reward {
-  if (reward.rewardType !== 'DepositOffer' && !reward.title.toLowerCase().includes('world cup')) {
+  if (reward.rewardId !== 'reward_010') {
     return reward;
   }
 
