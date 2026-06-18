@@ -19,7 +19,7 @@ function App() {
   const [data, setData] = useState<RewardsHubData>(fallbackRewardsHubData);
   const [appliedRewardIds, setAppliedRewardIds] = useState<string[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [cashierOffer, setCashierOffer] = useState<Reward | null>(null);
